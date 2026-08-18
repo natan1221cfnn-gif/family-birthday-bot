@@ -15,6 +15,15 @@ const CONFIG_FILE = path.join(DATA_DIR, 'config.json');
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Disable caching for all API responses to ensure real-time updates
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Helpers to read/write JSON files safely

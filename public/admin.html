@@ -417,7 +417,7 @@
     // Load Admin Birthdays List with Delete Action
     async function loadAdminBirthdays() {
       try {
-        const res = await fetch('/api/birthdays');
+        const res = await fetch(`/api/birthdays?t=${Date.now()}`);
         const list = await res.json();
         
         if (list.length === 0) {

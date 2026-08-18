@@ -120,7 +120,7 @@ function setupEventListeners() {
 // Fetch Birthdays from Backend
 async function loadBirthdays() {
   try {
-    const res = await fetch('/api/birthdays');
+    const res = await fetch(`/api/birthdays?t=${Date.now()}`);
     if (!res.ok) throw new Error('שגיאה בטעינת הנתונים');
     allBirthdays = await res.json();
     renderBirthdays();
