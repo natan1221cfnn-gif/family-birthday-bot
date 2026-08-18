@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ניהול והגדרות בוט ימי הולדת ⚙️</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+    .status-online {
+      background: var(--accent-sage-light);
+      color: var(--accent-sage);
+    }
+    .status-offline {
+      background: #FEE8E8;
+      color: #C0392B;
+    }
+    .status-qr {
+      background: #FFF8EB;
+      color: #E7A947;
+    }
+    .qr-box {
+      background: white;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--card-border);
+      display: inline-block;
+      margin: 16px 0;
+      text-align: center;
+    }
+    .qr-box img {
+      max-width: 240px;
+      height: auto;
+      border-radius: 8px;
+    }
+    .delete-btn {
+      background: #FFF1F0;
+      color: #E03131;
+      border: 1px solid #FFC9C9;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .delete-btn:hover {
+      background: #E03131;
+      color: white;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent-terracotta);
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .hint-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-shape bg-shape-1"></div>
+  <div class="bg-shape bg-shape-2"></div>
+
+  <div class="container admin-container">
+    
+    <a href="index.html" class="back-btn">➜ חזרה ללוח ימי ההולדת המשפחתי</a>
+
+    <!-- Pin Code Login Modal/Screen if not authenticated -->
+    <div id="authScreen" class="form-card">
+      <div class="card-header">
+        <div class="card-icon-bubble">🔒</div>
+        <div>
+          <h2 class="card-title">כניסה למערכת הניהול</h2>
+          <p class="card-subtitle">אנא הזינו את קוד המנהל (ברירת מחדל: 1234)</p>
+        </div>
+      </div>
+      <form id="authForm" class="birthday-form">
+        <div class="form-group">
+          <label for="adminPin">קוד PIN</label>
+          <input type="password" id="adminPin" placeholder="1234" required autofocus>
+        </div>
+        <button type="submit" class="submit-btn">כניסה למערכת</button>
+        <div id="authFeedback" class="form-feedback"></div>
+      </form>
+    </div>
+
+    <!-- Admin Content (hidden until logged in) -->
+    <div id="adminContent" style="display: none; display: flex; flex-direction: column; gap: 24px;">
+      
+      <!-- WhatsApp Connection Status -->
+      <section class="form-card">
+        <div class="card-header" style="justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div class="card-icon-bubble">📱</div>
+            <div>
+              <h2 class="card-title">חיבור לוואטסאפ (WhatsApp)</h2>
+              <p class="card-subtitle">סטטוס חיבור הבוט לחשבון הוואטסאפ</p>
+            </div>
+          </div>
+          <div id="botStatusBadge" class="status-badge status-offline">מנותק</div>
+        </div>
+
+        <div id="qrContainer" style="display: none; text-align: center;">
+          <p><strong>סרקו את קוד ה-QR באפליקציית וואטסאפ בטלפון:</strong></p>
+          <p class="hint-text">(הגדרות ➜ מכשירים מקושרים ➜ קישור מכשיר)</p>
+          <div class="qr-box">
+            <img id="qrImage" src="" alt="WhatsApp QR Code">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap;">
+          <button type="button" class="submit-btn" id="checkBotBtn" style="background: var(--accent-sage);">
+            🔄 רענן סטטוס חיבור
+          </button>
+          <button type="button" class="submit-btn" id="testMessageBtn" style="background: var(--accent-gold); color: #333;">
+            🧪 שלח הודעת בדיקה עכשיו
+          </button>
+        </div>
+        <div id="botActionFeedback" class="form-feedback"></div>
+      </section>
+
+      <!-- Settings Form -->
+      <section class="form-card">
+        <div class="card-header">
+          <div class="card-icon-bubble">⚙️</div>
+          <div>
+            <h2 class="card-title">הגדרות שליחה ותבנית</h2>
+            <p class="card-subtitle">התאמת שעת השליחה ונוסח הברכה</p>
+          </div>
+        </div>
+
+        <form id="configForm" class="birthday-form">
+          
+          <div class="form-group">
+            <label for="groupName">שם הקבוצה בוואטסאפ בדיוק</label>
+            <input type="text" id="groupName" name="groupName" placeholder="למשל: משפחה מורחבת ❤️" required>
+            <span class="hint-text">השם של קבוצת הוואטסאפ בדיוק כפי שהוא מופיע באפליקציה</span>
+          </div>
+
+          <div class="form-row" style="grid-template-columns: 1fr 1fr;">
+            <div class="form-group">
+              <label for="notificationHour">שעת שליחה בבוקר</label>
+              <select id="notificationHour" name="notificationHour">
+                <option value="6">06:00</option>
+                <option value="7">07:00</option>
+                <option value="8" selected>08:00</option>
+                <option value="9">09:00</option>
+                <option value="10">10:00</option>
+                <option value="11">11:00</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="notificationMinute">דקות</label>
+              <select id="notificationMinute" name="notificationMinute">
+                <option value="0">00</option>
+                <option value="15">15</option>
+                <option value="30" selected>30</option>
+                <option value="45">45</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="defaultWish">ברכת ברירת מחדל (למי שלא כתב איחול אישי)</label>
+            <input type="text" id="defaultWish" name="defaultWish" placeholder="מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨">
+            <span class="hint-text">הברכה שתופיע אוטומטית אם מישהו השאיר את שדה האיחול ריק</span>
+          </div>
+
+          <div class="form-group">
+            <label for="messageTemplate">תבנית הודעת הברכה בוואטסאפ</label>
+            <textarea id="messageTemplate" name="messageTemplate" rows="5"></textarea>
+            <span class="hint-text">ניתן להשתמש בתגיות: <code>{name}</code> לשם החוגג, <code>{ageText}</code> לגיל, <code>{wishText}</code> לברכה.</span>
+          </div>
+
+          <button type="submit" class="submit-btn">💾 שמור הגדרות</button>
+          <div id="configFeedback" class="form-feedback"></div>
+        </form>
+      </section>
+
+      <!-- Manage List & Delete entries -->
+      <section class="form-card">
+        <div class="card-header">
+          <div class="card-icon-bubble">📋</div>
+          <div>
+            <h2 class="card-title">ניהול ומחיקת רשומות</h2>
+            <p class="card-subtitle">עריכה ומחיקה של ימי הולדת מהרשימה</p>
+          </div>
+        </div>
+
+        <div id="adminBirthdaysList" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- Loaded dynamically -->
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <script>
+    let token = '';
+
+    const authScreen = document.getElementById('authScreen');
+    const adminContent = document.getElementById('adminContent');
+    const authForm = document.getElementById('authForm');
+    const authFeedback = document.getElementById('authFeedback');
+    
+    const botStatusBadge = document.getElementById('botStatusBadge');
+    const qrContainer = document.getElementById('qrContainer');
+    const qrImage = document.getElementById('qrImage');
+    const checkBotBtn = document.getElementById('checkBotBtn');
+    const testMessageBtn = document.getElementById('testMessageBtn');
+    const botActionFeedback = document.getElementById('botActionFeedback');
+
+    const configForm = document.getElementById('configForm');
+    const configFeedback = document.getElementById('configFeedback');
+    const adminBirthdaysList = document.getElementById('adminBirthdaysList');
+
+    // Login Handler
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pin = document.getElementById('adminPin').value.trim();
+      
+      try {
+        const res = await fetch('/api/admin/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'קוד שגוי');
+
+        token = data.token;
+        authScreen.style.display = 'none';
+        adminContent.style.display = 'flex';
+        
+        loadConfig();
+        loadBotStatus();
+        loadAdminBirthdays();
+      } catch (err) {
+        authFeedback.textContent = err.message;
+        authFeedback.className = 'form-feedback error';
+      }
+    });
+
+    // Load Bot Status
+    async function loadBotStatus() {
+      try {
+        const res = await fetch('/api/admin/bot-status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (data.status === 'CONNECTED') {
+          botStatusBadge.textContent = '🟢 מחובר לוואטסאפ';
+          botStatusBadge.className = 'status-badge status-online';
+          qrContainer.style.display = 'none';
+        } else if (data.status === 'QR_READY' && data.qrCode) {
+          botStatusBadge.textContent = '🟡 ממתין לסריקת QR';
+          botStatusBadge.className = 'status-badge status-qr';
+          qrImage.src = data.qrCode;
+          qrContainer.style.display = 'block';
+        } else {
+          botStatusBadge.textContent = '🔴 לא מחובר / מאתחל';
+          botStatusBadge.className = 'status-badge status-offline';
+          qrContainer.style.display = 'none';
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    checkBotBtn.addEventListener('click', loadBotStatus);
+
+    // Send Test Message
+    testMessageBtn.addEventListener('click', async () => {
+      botActionFeedback.textContent = 'שולח הודעת בדיקה...';
+      botActionFeedback.className = 'form-feedback';
+      botActionFeedback.style.display = 'block';
+
+      try {
+        const res = await fetch('/api/admin/send-test', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'שגיאה בשליחה');
+
+        botActionFeedback.textContent = data.message || 'הודעת בדיקה נשלחה בהצלחה! 🎉';
+        botActionFeedback.className = 'form-feedback success';
+      } catch (err) {
+        botActionFeedback.textContent = err.message;
+        botActionFeedback.className = 'form-feedback error';
+      }
+    });
+
+    // Load Config
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/admin/config', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const cfg = await res.json();
+        document.getElementById('groupName').value = cfg.groupName || '';
+        document.getElementById('notificationHour').value = cfg.notificationHour || 8;
+        document.getElementById('notificationMinute').value = cfg.notificationMinute || 30;
+        document.getElementById('defaultWish').value = cfg.defaultWish || '';
+        document.getElementById('messageTemplate').value = cfg.messageTemplate || '';
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Save Config
+    configForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const groupName = document.getElementById('groupName').value.trim();
+      const notificationHour = parseInt(document.getElementById('notificationHour').value, 10);
+      const notificationMinute = parseInt(document.getElementById('notificationMinute').value, 10);
+      const defaultWish = document.getElementById('defaultWish').value.trim();
+      const messageTemplate = document.getElementById('messageTemplate').value;
+
+      try {
+        const res = await fetch('/api/admin/config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ groupName, notificationHour, notificationMinute, defaultWish, messageTemplate })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'שגיאה בשמירה');
+
+        configFeedback.textContent = 'ההגדרות נשמרו בהצלחה! ✅';
+        configFeedback.className = 'form-feedback success';
+        setTimeout(() => configFeedback.style.display = 'none', 4000);
+      } catch (err) {
+        configFeedback.textContent = err.message;
+        configFeedback.className = 'form-feedback error';
+      }
+    });
+
+    // Load Admin Birthdays List with Delete Action
+    async function loadAdminBirthdays() {
+      try {
+        const res = await fetch('/api/birthdays');
+        const list = await res.json();
+        
+        if (list.length === 0) {
+          adminBirthdaysList.innerHTML = '<p class="hint-text">אין כרגע רשומות.</p>';
+          return;
+        }
+
+        adminBirthdaysList.innerHTML = list.map(item => `
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F5; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid #EFE8E0;">
+            <div>
+              <strong>${item.name}</strong> (${item.relation || 'משפחה'}) - ${item.day}/${item.month}${item.year ? '/' + item.year : ''}
+            </div>
+            <button class="delete-btn" onclick="deleteBirthday('${item.id}')">🗑️ מחיקה</button>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Delete Birthday
+    window.deleteBirthday = async function(id) {
+      if (!confirm('האם אתם בטוחים שברצונכם למחוק רשומה זו?')) return;
+      try {
+        const res = await fetch(`/api/admin/birthdays/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('שגיאה במחיקה');
+        loadAdminBirthdays();
+      } catch (err) {
+        alert(err.message);
+      }
+    };
+
+    // Auto poll status every 10 seconds if admin is active
+    setInterval(() => {
+      if (token) loadBotStatus();
+    }, 10000);
+  </script>
+</body>
+</html>

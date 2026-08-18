@@ -1,0 +1,8 @@
+{
+  "groupName": "משפחה",
+  "notificationHour": 8,
+  "notificationMinute": 30,
+  "defaultWish": "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨",
+  "messageTemplate": "🎉 *יום הולדת שמח!* 🎉\n\nהמון מזל טוב ל-*{name}* היקר/ה שחוגג/ת היום יום הולדת{ageText}! 🎂🎈\n{wishText}\n\nאוהבים ומאחלים מכל הלב, המשפחה! 🥳💐",
+  "adminPin": "1234"
+}
