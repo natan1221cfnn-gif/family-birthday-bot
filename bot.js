@@ -17,6 +17,11 @@ class WhatsAppBot {
     console.log('🤖 WhatsApp Bot: מאתחל לקוח וואטסאפ...');
 
     const possibleChromePaths = [
+      process.env.PUPPETEER_EXECUTABLE_PATH,
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/chromium-browser',
+      '/usr/bin/chromium',
+      '/usr/bin/google-chrome',
       'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
       'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
       'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
@@ -24,7 +29,7 @@ class WhatsAppBot {
 
     let chromePath = undefined;
     for (const p of possibleChromePaths) {
-      if (fs.existsSync(p)) {
+      if (p && fs.existsSync(p)) {
         chromePath = p;
         break;
       }
