@@ -441,15 +441,17 @@
     // Delete Birthday
     window.deleteBirthday = async function(id) {
       if (!confirm('האם אתם בטוחים שברצונכם למחוק רשומה זו?')) return;
+      const activeToken = token || sessionStorage.getItem('admin_token');
       try {
         const res = await fetch(`/api/admin/birthdays/${id}`, {
           method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${activeToken}` }
         });
-        if (!res.ok) throw new Error('שגיאה במחיקה');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'שגיאה במחיקה');
         loadAdminBirthdays();
       } catch (err) {
-        alert(err.message);
+        alert(err.message || 'שגיאה במחיקה');
       }
     };
 
