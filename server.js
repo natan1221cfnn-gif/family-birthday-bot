@@ -59,6 +59,14 @@ function saveConfig(cfg) {
 // Public APIs
 // ----------------------------------------------------
 
+// Get public config (default wish, etc.)
+app.get('/api/public-config', (req, res) => {
+  const config = getConfig();
+  res.json({
+    defaultWish: config.defaultWish || "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨"
+  });
+});
+
 // Get all birthdays
 app.get('/api/birthdays', (req, res) => {
   const list = getBirthdays();
@@ -74,6 +82,9 @@ app.post('/api/birthdays', (req, res) => {
   }
 
   const list = getBirthdays();
+  const config = getConfig();
+  const fallbackWish = config.defaultWish || "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨";
+
   const newEntry = {
     id: 'bday_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
     name: name.trim(),
@@ -81,7 +92,7 @@ app.post('/api/birthdays', (req, res) => {
     month: parseInt(month, 10),
     year: year ? parseInt(year, 10) : null,
     relation: relation ? relation.trim() : '',
-    customWish: customWish ? customWish.trim() : '',
+    customWish: (customWish && customWish.trim()) ? customWish.trim() : fallbackWish,
     createdAt: new Date().toISOString()
   };
 
