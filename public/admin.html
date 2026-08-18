@@ -88,23 +88,26 @@
 
   <div class="container admin-container">
     
-    <a href="index.html" class="back-btn">➜ חזרה ללוח ימי ההולדת המשפחתי</a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+      <a href="index.html" class="back-btn" style="margin-bottom: 0;">➜ חזרה ללוח ימי ההולדת המשפחתי</a>
+      <button type="button" id="logoutBtn" class="back-btn" style="border: none; background: none; cursor: pointer; color: #C0392B; display: none;">התנתקות 🚪</button>
+    </div>
 
     <!-- Pin Code Login Modal/Screen if not authenticated -->
-    <div id="authScreen" class="form-card">
+    <div id="authScreen" class="form-card" style="max-width: 440px; margin: 40px auto 0;">
       <div class="card-header">
-        <div class="card-icon-bubble">🔒</div>
+        <div class="card-icon-bubble">🔐</div>
         <div>
           <h2 class="card-title">כניסה למערכת הניהול</h2>
-          <p class="card-subtitle">אנא הזינו את קוד המנהל (ברירת מחדל: 1234)</p>
+          <p class="card-subtitle">אנא הזינו את סיסמת המנהל</p>
         </div>
       </div>
       <form id="authForm" class="birthday-form">
         <div class="form-group">
-          <label for="adminPin">קוד PIN</label>
-          <input type="password" id="adminPin" placeholder="1234" required autofocus>
+          <label for="adminPin">סיסמה</label>
+          <input type="password" id="adminPin" placeholder="הקלד סיסמה..." required autofocus>
         </div>
-        <button type="submit" class="submit-btn">כניסה למערכת</button>
+        <button type="submit" class="submit-btn">כניסה לפאנל הניהול ➜</button>
         <div id="authFeedback" class="form-feedback"></div>
       </form>
     </div>
@@ -240,6 +243,40 @@
     const configFeedback = document.getElementById('configFeedback');
     const adminBirthdaysList = document.getElementById('adminBirthdaysList');
 
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Check existing session token on load
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedToken = sessionStorage.getItem('admin_token');
+      if (savedToken) {
+        token = savedToken;
+        verifyAndShowDashboard();
+      }
+    });
+
+    async function verifyAndShowDashboard() {
+      try {
+        const res = await fetch('/api/admin/config', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('פג תוקף החיבור');
+        
+        authScreen.style.display = 'none';
+        adminContent.style.display = 'flex';
+        logoutBtn.style.display = 'inline-block';
+        
+        loadConfig();
+        loadBotStatus();
+        loadAdminBirthdays();
+      } catch (e) {
+        sessionStorage.removeItem('admin_token');
+        token = '';
+        authScreen.style.display = 'block';
+        adminContent.style.display = 'none';
+        logoutBtn.style.display = 'none';
+      }
+    }
+
     // Login Handler
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -252,19 +289,31 @@
           body: JSON.stringify({ pin })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'קוד שגוי');
+        if (!res.ok) throw new Error(data.message || 'סיסמה שגויה');
 
         token = data.token;
+        sessionStorage.setItem('admin_token', data.token);
         authScreen.style.display = 'none';
         adminContent.style.display = 'flex';
+        logoutBtn.style.display = 'inline-block';
         
         loadConfig();
         loadBotStatus();
         loadAdminBirthdays();
       } catch (err) {
-        authFeedback.textContent = err.message;
+        authFeedback.textContent = err.message || 'סיסמה שגויה';
         authFeedback.className = 'form-feedback error';
       }
+    });
+
+    // Logout Handler
+    logoutBtn.addEventListener('click', () => {
+      sessionStorage.removeItem('admin_token');
+      token = '';
+      authScreen.style.display = 'block';
+      adminContent.style.display = 'none';
+      logoutBtn.style.display = 'none';
+      document.getElementById('adminPin').value = '';
     });
 
     // Load Bot Status

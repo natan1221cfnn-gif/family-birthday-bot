@@ -46,6 +46,75 @@ function setupEventListeners() {
   birthdayForm.addEventListener('submit', handleFormSubmit);
   searchInput.addEventListener('input', renderBirthdays);
   monthFilter.addEventListener('change', renderBirthdays);
+
+  // Admin Login Modal Events
+  const openModalBtn = document.getElementById('openAdminModalBtn');
+  const closeModalBtn = document.getElementById('closeAdminModalBtn');
+  const adminModal = document.getElementById('adminModal');
+  const modalAdminForm = document.getElementById('modalAdminForm');
+  const modalAdminPin = document.getElementById('modalAdminPin');
+  const modalAuthFeedback = document.getElementById('modalAuthFeedback');
+  const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+
+  if (openModalBtn && adminModal) {
+    openModalBtn.addEventListener('click', () => {
+      adminModal.style.display = 'flex';
+      modalAdminPin.value = '';
+      modalAuthFeedback.style.display = 'none';
+      setTimeout(() => modalAdminPin.focus(), 50);
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      adminModal.style.display = 'none';
+    });
+
+    adminModal.addEventListener('click', (e) => {
+      if (e.target === adminModal) {
+        adminModal.style.display = 'none';
+      }
+    });
+
+    modalAdminForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const pin = modalAdminPin.value.trim();
+      if (!pin) return;
+
+      const btnText = modalSubmitBtn.querySelector('.btn-text');
+      const btnLoader = modalSubmitBtn.querySelector('.btn-loader');
+      btnText.style.display = 'none';
+      btnLoader.style.display = 'inline';
+      modalSubmitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/admin/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'סיסמה שגויה');
+
+        // Store token in session storage and redirect
+        sessionStorage.setItem('admin_token', data.token);
+        modalAuthFeedback.textContent = 'סיסמה נכונה! מעביר לפאנל הניהול... 🚀';
+        modalAuthFeedback.className = 'form-feedback success';
+        modalAuthFeedback.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.href = 'admin.html';
+        }, 400);
+
+      } catch (err) {
+        modalAuthFeedback.textContent = err.message || 'סיסמה שגויה, נסו שוב';
+        modalAuthFeedback.className = 'form-feedback error';
+        modalAuthFeedback.style.display = 'block';
+      } finally {
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
+        modalSubmitBtn.disabled = false;
+      }
+    });
+  }
 }
 
 // Fetch Birthdays from Backend
