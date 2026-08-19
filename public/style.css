@@ -645,6 +645,31 @@ textarea {
   align-items: center;
 }
 
+.contact-dev-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #E8F5E9;
+  color: #2E7D32;
+  border: 1px solid #C8E6C9;
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 5px 14px;
+  border-radius: 50px;
+  margin: 4px 0;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.08);
+}
+
+.contact-dev-btn:hover {
+  background: #2E7D32;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(46, 125, 50, 0.2);
+}
+
 .admin-link-btn {
   background: none;
   border: none;
