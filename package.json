@@ -4,19 +4,25 @@
   "description": "A warm, human-crafted family birthday tracker landing page and WhatsApp bot",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "postinstall": "npx puppeteer browsers install chrome"
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
     "cors": "^2.8.5",
+    "express": "^4.19.2",
     "node-cron": "^3.0.3",
-    "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "^1.26.0",
+    "pino": "^10.3.1",
     "puppeteer": "^22.15.0",
-    "qrcode": "^1.5.3"
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.26.0"
   },
-  "keywords": ["whatsapp", "birthday", "bot", "family"],
+  "keywords": [
+    "whatsapp",
+    "birthday",
+    "bot",
+    "family"
+  ],
   "author": "",
   "license": "MIT"
 }

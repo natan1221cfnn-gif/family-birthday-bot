@@ -1,4 +1,5 @@
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
+const pino = require('pino');
 const qrcode = require('qrcode');
 const qrcodeTerminal = require('qrcode-terminal');
 const fs = require('fs');
@@ -6,103 +7,75 @@ const path = require('path');
 
 class WhatsAppBot {
   constructor() {
-    this.client = null;
+    this.sock = null;
     this.status = 'DISCONNECTED'; // 'DISCONNECTED', 'INITIALIZING', 'QR_READY', 'CONNECTED'
     this.qrCodeDataUrl = null;
     this.qrRaw = null;
+    this.authDir = path.join(__dirname, '.baileys_auth');
   }
 
   async initialize() {
     this.status = 'INITIALIZING';
-    console.log('🤖 WhatsApp Bot: מאתחל לקוח וואטסאפ...');
-
-    const possibleChromePaths = [
-      process.env.PUPPETEER_EXECUTABLE_PATH,
-      '/usr/bin/google-chrome-stable',
-      '/usr/bin/chromium-browser',
-      '/usr/bin/chromium',
-      '/usr/bin/google-chrome',
-      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-      'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-      'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
-    ];
-
-    let chromePath = undefined;
-    for (const p of possibleChromePaths) {
-      if (p && fs.existsSync(p)) {
-        chromePath = p;
-        break;
-      }
-    }
+    console.log('⚡ WhatsApp Bot (Baileys Engine): מאתחל חיבור סופר-מהיר...');
 
     try {
-      this.client = new Client({
-        authStrategy: new LocalAuth({
-          dataPath: path.join(__dirname, '.wwebjs_auth')
-        }),
-        webVersionCache: {
-          type: 'remote',
-          remotePath: 'https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html',
-        },
-        puppeteer: {
-          headless: true,
-          executablePath: chromePath,
-          args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--disable-gpu',
-            '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-          ]
+      if (!fs.existsSync(this.authDir)) {
+        fs.mkdirSync(this.authDir, { recursive: true });
+      }
+
+      const { state, saveCreds } = await useMultiFileAuthState(this.authDir);
+      const { version } = await fetchLatestBaileysVersion();
+
+      this.sock = makeWASocket({
+        version,
+        logger: pino({ level: 'silent' }),
+        printQRInTerminal: false,
+        auth: state,
+        browser: ['Family Birthday Hub', 'Chrome', '1.0.0'],
+        connectTimeoutMs: 60000,
+        defaultQueryTimeoutMs: 60000
+      });
+
+      this.sock.ev.on('creds.update', saveCreds);
+
+      this.sock.ev.on('connection.update', async (update) => {
+        const { connection, lastDisconnect, qr } = update;
+
+        if (qr) {
+          this.status = 'QR_READY';
+          this.qrRaw = qr;
+          console.log('\n📲 QR Code התקבל תוך שבריר שניה! סרוק דרך הטרמינל או דרך עמוד הניהול:');
+          qrcodeTerminal.generate(qr, { small: true });
+
+          try {
+            this.qrCodeDataUrl = await qrcode.toDataURL(qr);
+          } catch (err) {
+            console.error('Error generating QR DataURL:', err);
+          }
         }
-      });
 
-      this.client.on('qr', async (qr) => {
-        this.status = 'QR_READY';
-        this.qrRaw = qr;
-        console.log('\n📲 QR Code התקבל! סרוק דרך הטרמינל או דרך עמוד הניהול:');
-        qrcodeTerminal.generate(qr, { small: true });
+        if (connection === 'close') {
+          const statusCode = (lastDisconnect?.error)?.output?.statusCode;
+          const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+          console.log('⚠️ חיבור וואטסאפ נסגר:', lastDisconnect?.error?.message || 'ניתוק');
 
-        // Convert to data URL for web admin interface
-        try {
-          this.qrCodeDataUrl = await qrcode.toDataURL(qr);
-        } catch (err) {
-          console.error('Error generating QR DataURL:', err);
+          if (shouldReconnect) {
+            console.log('🔄 מתחבר מחדש אוטומטית...');
+            setTimeout(() => this.initialize(), 3000);
+          } else {
+            this.status = 'DISCONNECTED';
+            this.qrCodeDataUrl = null;
+          }
+        } else if (connection === 'open') {
+          this.status = 'CONNECTED';
+          this.qrCodeDataUrl = null;
+          this.qrRaw = null;
+          console.log('✅ בוט הוואטסאפ מחובר בהצלחה (Baileys Engine)!');
         }
-      });
-
-      this.client.on('ready', () => {
-        this.status = 'CONNECTED';
-        this.qrCodeDataUrl = null;
-        this.qrRaw = null;
-        console.log('✅ בוט הוואטסאפ מחובר ומוכן לפעולה!');
-      });
-
-      this.client.on('authenticated', () => {
-        console.log('🔐 חיבור וואטסאפ אומת בהצלחה!');
-      });
-
-      this.client.on('auth_failure', (msg) => {
-        this.status = 'DISCONNECTED';
-        console.error('❌ שגיאת אימות וואטסאפ:', msg);
-      });
-
-      this.client.on('disconnected', (reason) => {
-        this.status = 'DISCONNECTED';
-        this.qrCodeDataUrl = null;
-        console.log('⚠️ וואטסאפ התנתק:', reason);
-      });
-
-      this.client.initialize().catch((err) => {
-        console.error('Error in client.initialize():', err.message);
-        this.status = 'DISCONNECTED';
       });
 
     } catch (err) {
-      console.error('Error initializing WhatsApp client:', err);
+      console.error('Error initializing Baileys client:', err);
       this.status = 'DISCONNECTED';
     }
   }
@@ -115,47 +88,32 @@ class WhatsAppBot {
   }
 
   async logoutAndWipeSession() {
-    console.log('🧹 מתחיל תהליך ניתוק ומחיקה מלאה של נתוני הוואטסאפ...');
+    console.log('🧹 מתחיל ניתוק ומחיקה מלאה של נתוני הוואטסאפ...');
     try {
-      if (this.client) {
+      if (this.sock) {
         try {
-          await this.client.logout();
-        } catch (e) {
-          console.warn('Logout warning (already logged out or network down):', e.message);
-        }
+          await this.sock.logout();
+        } catch (e) {}
         try {
-          await this.client.destroy();
-        } catch (e) {
-          console.warn('Destroy warning:', e.message);
-        }
+          this.sock.end();
+        } catch (e) {}
       }
-    } catch (err) {
-      console.error('Error during client logout/destroy:', err);
-    }
+    } catch (err) {}
 
-    this.client = null;
+    this.sock = null;
     this.status = 'DISCONNECTED';
     this.qrCodeDataUrl = null;
     this.qrRaw = null;
 
-    // Completely wipe session files from disk
-    const authDir = path.join(__dirname, '.wwebjs_auth');
-    const cacheDir = path.join(__dirname, '.wwebjs_cache');
-
     try {
-      if (fs.existsSync(authDir)) {
-        fs.rmSync(authDir, { recursive: true, force: true });
-        console.log('🗑️ תיקיית ההרשאות .wwebjs_auth נמחקה לחלוטין.');
-      }
-      if (fs.existsSync(cacheDir)) {
-        fs.rmSync(cacheDir, { recursive: true, force: true });
-        console.log('🗑️ תיקיית המטמון .wwebjs_cache נמחקה לחלוטין.');
+      if (fs.existsSync(this.authDir)) {
+        fs.rmSync(this.authDir, { recursive: true, force: true });
+        console.log('🗑️ תיקיית ההרשאות .baileys_auth נמחקה לחלוטין.');
       }
     } catch (err) {
-      console.error('Error deleting session folders:', err.message);
+      console.error('Error deleting session folder:', err.message);
     }
 
-    // Reinitialize fresh client to immediately generate a new QR
     setTimeout(() => {
       this.initialize().catch(err => console.error('Error reinitializing bot:', err));
     }, 1000);
@@ -163,17 +121,21 @@ class WhatsAppBot {
     return true;
   }
 
-  async findChatByName(chatName) {
-    if (!this.client || this.status !== 'CONNECTED') {
+  async findGroupJidByName(groupName) {
+    if (!this.sock || this.status !== 'CONNECTED') {
       throw new Error('בוט הוואטסאפ אינו מחובר כרגע');
     }
 
-    const chats = await this.client.getChats();
-    const cleanSearch = chatName.trim().toLowerCase();
+    const groupList = await this.sock.groupFetchAllParticipating();
+    const cleanSearch = groupName.trim().toLowerCase();
 
-    // Exact or contains match
-    const found = chats.find(c => c.name && c.name.trim().toLowerCase().includes(cleanSearch));
-    return found;
+    for (const [jid, group] of Object.entries(groupList)) {
+      if (group.subject && group.subject.trim().toLowerCase().includes(cleanSearch)) {
+        return jid;
+      }
+    }
+
+    return null;
   }
 
   async sendBirthdayGreeting(birthdayPerson, config) {
@@ -189,7 +151,6 @@ class WhatsAppBot {
       ageText = ` ${age}`;
     }
 
-    // Handle custom wish or fallback to default wish from config
     const defaultWish = config.defaultWish || "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨";
     const chosenWish = (birthdayPerson.customWish && birthdayPerson.customWish.trim()) 
       ? birthdayPerson.customWish.trim() 
@@ -197,7 +158,6 @@ class WhatsAppBot {
 
     const wishText = `💬 *ברכה:* "${chosenWish}"`;
 
-    // Build message template
     let text = config.messageTemplate || "🎉 *יום הולדת שמח!* 🎉\n\nהמון מזל טוב ל-*{name}*! 🎂🎈\n{wishText}";
     text = text.replace(/{name}/g, birthdayPerson.name);
     text = text.replace(/{ageText}/g, ageText);
@@ -208,13 +168,13 @@ class WhatsAppBot {
   }
 
   async sendMessageToGroup(groupName, text) {
-    const chat = await this.findChatByName(groupName);
-    if (!chat) {
-      throw new Error(`קבוצת הוואטסאפ בשם "${groupName}" לא נמצאה באנשי הקשר/קבוצות של החשבון המחובר.`);
+    const groupJid = await this.findGroupJidByName(groupName);
+    if (!groupJid) {
+      throw new Error(`קבוצת הוואטסאפ בשם "${groupName}" לא נמצאה בחשבון המחובר.`);
     }
 
-    await chat.sendMessage(text);
-    console.log(`[Bot] ✅ הודעה נשלחה בהצלחה לקבוצה "${chat.name}"!`);
+    await this.sock.sendMessage(groupJid, { text });
+    console.log(`[Bot] ✅ הודעה נשלחה בהצלחה לקבוצה "${groupName}"!`);
     return true;
   }
 }

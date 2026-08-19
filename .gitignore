@@ -1,6 +1,8 @@
 node_modules/
+.cache/
 .wwebjs_auth/
 .wwebjs_cache/
+.baileys_auth/
 .env
 .DS_Store
 *.log
