@@ -247,18 +247,21 @@ function scheduleDailyJob() {
   const hour = config.notificationHour !== undefined ? config.notificationHour : 8;
   const minute = config.notificationMinute !== undefined ? config.notificationMinute : 30;
 
-  // Cron format: MINUTE HOUR * * *
+  // Cron format: MINUTE HOUR * * * with Asia/Jerusalem timezone
   const cronExpr = `${minute} ${hour} * * *`;
-  console.log(`⏰ משימת ימי הולדת מתוזמנת לשעה ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} בכל יום.`);
+  console.log(`⏰ משימת ימי הולדת מתוזמנת לשעה ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} (שעון ישראל) בכל יום.`);
 
   scheduledTask = cron.schedule(cronExpr, async () => {
-    console.log('⏰ מתחיל בדיקת ימי הולדת יומית...');
+    console.log('⏰ מתחיל בדיקת ימי הולדת יומית (שעון ישראל)...');
     await checkAndSendTodayBirthdays();
+  }, {
+    timezone: "Asia/Jerusalem"
   });
 }
 
 async function checkAndSendTodayBirthdays() {
-  const now = new Date();
+  const israelDateStr = new Date().toLocaleString("en-US", { timeZone: "Asia/Jerusalem" });
+  const now = new Date(israelDateStr);
   const todayDay = now.getDate();
   const todayMonth = now.getMonth() + 1;
 
