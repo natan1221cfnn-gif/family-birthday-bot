@@ -12,11 +12,14 @@ class WhatsAppBot {
     this.qrCodeDataUrl = null;
     this.qrRaw = null;
     this.authDir = path.join(__dirname, '.baileys_auth');
+    this.isReconnecting = false;
   }
 
   async initialize() {
+    if (this.isReconnecting) return;
+    this.isReconnecting = true;
     this.status = 'INITIALIZING';
-    console.log('⚡ WhatsApp Bot (Baileys Engine): מאתחל חיבור סופר-מהיר...');
+    console.log('⚡ WhatsApp Bot: מאתחל חיבור...');
 
     try {
       if (!fs.existsSync(this.authDir)) {
@@ -31,9 +34,10 @@ class WhatsAppBot {
         logger: pino({ level: 'silent' }),
         printQRInTerminal: false,
         auth: state,
-        browser: Browsers.ubuntu('Chrome'),
+        browser: Browsers.macOS('Desktop'),
         syncFullHistory: false,
-        markOnlineOnConnect: false,
+        markOnlineOnConnect: true,
+        keepAliveIntervalMs: 25000,
         connectTimeoutMs: 60000,
         defaultQueryTimeoutMs: 60000
       });
@@ -46,7 +50,7 @@ class WhatsAppBot {
         if (qr) {
           this.status = 'QR_READY';
           this.qrRaw = qr;
-          console.log('\n📲 QR Code התקבל תוך שבריר שניה! סרוק דרך הטרמינל או דרך עמוד הניהול:');
+          console.log('\n📲 QR Code התקבל! סרוק דרך הטרמינל או עמוד הניהול.');
           qrcodeTerminal.generate(qr, { small: true });
 
           try {
@@ -59,27 +63,56 @@ class WhatsAppBot {
         if (connection === 'close') {
           const statusCode = (lastDisconnect?.error)?.output?.statusCode;
           const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
-          console.log('⚠️ חיבור וואטסאפ נסגר:', lastDisconnect?.error?.message || 'ניתוק');
+          console.log('⚠️ חיבור וואטסאפ נסגר (קוד:', statusCode, '):', lastDisconnect?.error?.message || 'ניתוק');
+
+          this.status = 'DISCONNECTED';
+          this.isReconnecting = false;
 
           if (shouldReconnect) {
-            console.log('🔄 מתחבר מחדש אוטומטית...');
+            console.log('🔄 מתחבר מחדש אוטומטית בעוד 3 שניות...');
             setTimeout(() => this.initialize(), 3000);
           } else {
-            this.status = 'DISCONNECTED';
+            console.log('🚪 החשבון נותק לחלוטין (Logged Out).');
             this.qrCodeDataUrl = null;
           }
         } else if (connection === 'open') {
           this.status = 'CONNECTED';
           this.qrCodeDataUrl = null;
           this.qrRaw = null;
-          console.log('✅ בוט הוואטסאפ מחובר בהצלחה (Baileys Engine)!');
+          this.isReconnecting = false;
+          console.log('✅ בוט הוואטסאפ מחובר ופעיל בהצלחה!');
         }
       });
 
     } catch (err) {
       console.error('Error initializing Baileys client:', err);
       this.status = 'DISCONNECTED';
+      this.isReconnecting = false;
     }
+  }
+
+  async ensureConnected(maxWaitMs = 12000) {
+    if (this.status === 'CONNECTED' && this.sock?.ws?.isOpen) {
+      return true;
+    }
+
+    console.log('🔄 מוודא חיבור פעיל לפני פעולה...');
+    if (this.status === 'DISCONNECTED') {
+      this.initialize();
+    }
+
+    const start = Date.now();
+    while (Date.now() - start < maxWaitMs) {
+      if (this.status === 'CONNECTED' && this.sock?.ws?.isOpen) {
+        return true;
+      }
+      await new Promise(r => setTimeout(r, 500));
+    }
+
+    if (this.status !== 'CONNECTED') {
+      throw new Error('חיבור הוואטסאפ מתרענן כרגע. אנא נסו שוב בעוד כמה שניות (Connection Reconnecting).');
+    }
+    return true;
   }
 
   getStatus() {
@@ -125,11 +158,12 @@ class WhatsAppBot {
     this.status = 'DISCONNECTED';
     this.qrCodeDataUrl = null;
     this.qrRaw = null;
+    this.isReconnecting = false;
 
     try {
       if (fs.existsSync(this.authDir)) {
         fs.rmSync(this.authDir, { recursive: true, force: true });
-        console.log('🗑️ תיקיית ההרשאות .baileys_auth נמחקה לחלוטין.');
+        console.log('🗑️ תיקיית ההרשאות נמחקה לחלוטין.');
       }
     } catch (err) {
       console.error('Error deleting session folder:', err.message);
@@ -143,27 +177,30 @@ class WhatsAppBot {
   }
 
   async findGroupJidByName(groupName) {
-    if (!this.sock || this.status !== 'CONNECTED') {
-      throw new Error('בוט הוואטסאפ אינו מחובר כרגע');
-    }
+    await this.ensureConnected();
 
     const groupList = await this.sock.groupFetchAllParticipating();
     const cleanSearch = groupName.trim().toLowerCase();
+    const availableGroupNames = [];
 
     for (const [jid, group] of Object.entries(groupList)) {
-      if (group.subject && group.subject.trim().toLowerCase().includes(cleanSearch)) {
-        return jid;
+      if (group.subject) {
+        availableGroupNames.push(group.subject);
+        if (group.subject.trim().toLowerCase().includes(cleanSearch)) {
+          return jid;
+        }
       }
     }
 
-    return null;
+    const availableHint = availableGroupNames.length > 0
+      ? `\nהקבוצות שנמצאו בחשבון: ${availableGroupNames.map(n => `"${n}"`).join(', ')}`
+      : '\nלא נמצאו קבוצות בחשבון זה.';
+
+    throw new Error(`קבוצת הוואטסאפ בשם "${groupName}" לא נמצאה.${availableHint}`);
   }
 
   async sendBirthdayGreeting(birthdayPerson, config) {
-    if (this.status !== 'CONNECTED') {
-      console.warn(`[Bot] דילוג על שליחה ל-${birthdayPerson.name}: הבוט אינו מחובר.`);
-      return false;
-    }
+    await this.ensureConnected();
 
     const currentYear = new Date().getFullYear();
     let ageText = '';
@@ -188,15 +225,22 @@ class WhatsAppBot {
     return await this.sendMessageToGroup(config.groupName, text);
   }
 
-  async sendMessageToGroup(groupName, text) {
-    const groupJid = await this.findGroupJidByName(groupName);
-    if (!groupJid) {
-      throw new Error(`קבוצת הוואטסאפ בשם "${groupName}" לא נמצאה בחשבון המחובר.`);
-    }
+  async sendMessageToGroup(groupName, text, retryCount = 1) {
+    try {
+      await this.ensureConnected();
+      const groupJid = await this.findGroupJidByName(groupName);
 
-    await this.sock.sendMessage(groupJid, { text });
-    console.log(`[Bot] ✅ הודעה נשלחה בהצלחה לקבוצה "${groupName}"!`);
-    return true;
+      await this.sock.sendMessage(groupJid, { text });
+      console.log(`[Bot] ✅ הודעה נשלחה בהצלחה לקבוצה "${groupName}"!`);
+      return true;
+    } catch (err) {
+      if (retryCount > 0 && (err.message.includes('Closed') || err.message.includes('disconnect') || err.message.includes('Reconnecting'))) {
+        console.log('🔄 שגיאת חיבור בזמן שליחה, מנסה שוב לאחר רענון חיבור...');
+        await new Promise(r => setTimeout(r, 2000));
+        return await this.sendMessageToGroup(groupName, text, retryCount - 1);
+      }
+      throw err;
+    }
   }
 }
 
