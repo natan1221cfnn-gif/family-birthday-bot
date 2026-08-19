@@ -167,6 +167,16 @@ app.get('/api/admin/bot-status', checkAuth, (req, res) => {
   res.json(bot.getStatus());
 });
 
+// Logout and Wipe WhatsApp Session completely
+app.post('/api/admin/bot-logout', checkAuth, async (req, res) => {
+  try {
+    await bot.logoutAndWipeSession();
+    res.json({ message: 'חשבון הוואטסאפ נותק וכל נתוני החיבור נמחקו לצמיתות מהשרת! ✅' });
+  } catch (err) {
+    res.status(500).json({ message: err.message || 'שגיאה בניתוק החשבון' });
+  }
+});
+
 // Send Test Message
 app.post('/api/admin/send-test', checkAuth, async (req, res) => {
   try {

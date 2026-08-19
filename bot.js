@@ -109,6 +109,55 @@ class WhatsAppBot {
     };
   }
 
+  async logoutAndWipeSession() {
+    console.log('🧹 מתחיל תהליך ניתוק ומחיקה מלאה של נתוני הוואטסאפ...');
+    try {
+      if (this.client) {
+        try {
+          await this.client.logout();
+        } catch (e) {
+          console.warn('Logout warning (already logged out or network down):', e.message);
+        }
+        try {
+          await this.client.destroy();
+        } catch (e) {
+          console.warn('Destroy warning:', e.message);
+        }
+      }
+    } catch (err) {
+      console.error('Error during client logout/destroy:', err);
+    }
+
+    this.client = null;
+    this.status = 'DISCONNECTED';
+    this.qrCodeDataUrl = null;
+    this.qrRaw = null;
+
+    // Completely wipe session files from disk
+    const authDir = path.join(__dirname, '.wwebjs_auth');
+    const cacheDir = path.join(__dirname, '.wwebjs_cache');
+
+    try {
+      if (fs.existsSync(authDir)) {
+        fs.rmSync(authDir, { recursive: true, force: true });
+        console.log('🗑️ תיקיית ההרשאות .wwebjs_auth נמחקה לחלוטין.');
+      }
+      if (fs.existsSync(cacheDir)) {
+        fs.rmSync(cacheDir, { recursive: true, force: true });
+        console.log('🗑️ תיקיית המטמון .wwebjs_cache נמחקה לחלוטין.');
+      }
+    } catch (err) {
+      console.error('Error deleting session folders:', err.message);
+    }
+
+    // Reinitialize fresh client to immediately generate a new QR
+    setTimeout(() => {
+      this.initialize().catch(err => console.error('Error reinitializing bot:', err));
+    }, 1000);
+
+    return true;
+  }
+
   async findChatByName(chatName) {
     if (!this.client || this.status !== 'CONNECTED') {
       throw new Error('בוט הוואטסאפ אינו מחובר כרגע');

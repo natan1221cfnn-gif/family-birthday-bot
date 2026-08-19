@@ -140,8 +140,11 @@
           <button type="button" class="submit-btn" id="checkBotBtn" style="background: var(--accent-sage);">
             🔄 רענן סטטוס חיבור
           </button>
-          <button type="button" class="submit-btn" id="testMessageBtn" style="background: var(--accent-gold); color: #333;">
+          <button type="button" class="submit-btn" id="testMessageBtn" style="background: var(--accent-gold); color: #333; display: none;">
             🧪 שלח הודעת בדיקה עכשיו
+          </button>
+          <button type="button" class="submit-btn" id="disconnectBotBtn" style="background: #C0392B; display: none;">
+            🔌 נתק חשבון ומחק נתונים לצמיתות
           </button>
         </div>
         <div id="botActionFeedback" class="form-feedback"></div>
@@ -237,6 +240,7 @@
     const qrImage = document.getElementById('qrImage');
     const checkBotBtn = document.getElementById('checkBotBtn');
     const testMessageBtn = document.getElementById('testMessageBtn');
+    const disconnectBotBtn = document.getElementById('disconnectBotBtn');
     const botActionFeedback = document.getElementById('botActionFeedback');
 
     const configForm = document.getElementById('configForm');
@@ -318,9 +322,10 @@
 
     // Load Bot Status
     async function loadBotStatus() {
+      const activeToken = token || sessionStorage.getItem('admin_token');
       try {
-        const res = await fetch('/api/admin/bot-status', {
-          headers: { 'Authorization': `Bearer ${token}` }
+        const res = await fetch(`/api/admin/bot-status?t=${Date.now()}`, {
+          headers: { 'Authorization': `Bearer ${activeToken}` }
         });
         const data = await res.json();
         
@@ -328,15 +333,21 @@
           botStatusBadge.textContent = '🟢 מחובר לוואטסאפ';
           botStatusBadge.className = 'status-badge status-online';
           qrContainer.style.display = 'none';
+          testMessageBtn.style.display = 'inline-block';
+          disconnectBotBtn.style.display = 'inline-block';
         } else if (data.status === 'QR_READY' && data.qrCode) {
           botStatusBadge.textContent = '🟡 ממתין לסריקת QR';
           botStatusBadge.className = 'status-badge status-qr';
           qrImage.src = data.qrCode;
           qrContainer.style.display = 'block';
+          testMessageBtn.style.display = 'none';
+          disconnectBotBtn.style.display = 'none';
         } else {
           botStatusBadge.textContent = '🔴 לא מחובר / מאתחל';
           botStatusBadge.className = 'status-badge status-offline';
           qrContainer.style.display = 'none';
+          testMessageBtn.style.display = 'none';
+          disconnectBotBtn.style.display = 'none';
         }
       } catch (err) {
         console.error(err);
@@ -345,16 +356,46 @@
 
     checkBotBtn.addEventListener('click', loadBotStatus);
 
+    // Disconnect WhatsApp & Wipe Session Handler
+    disconnectBotBtn.addEventListener('click', async () => {
+      const confirmMsg = 'האם אתם בטוחים שברצונכם לנתק את חשבון הוואטסאפ?\n\nפעולה זו תמחק לחלוטין את כל נתוני החיבור מהשרת ולא יישאר שום זכר למספר.';
+      if (!confirm(confirmMsg)) return;
+
+      botActionFeedback.textContent = 'מנתק את החשבון ומוחק את כל נתוני החיבור... ⏳';
+      botActionFeedback.className = 'form-feedback';
+      botActionFeedback.style.display = 'block';
+
+      const activeToken = token || sessionStorage.getItem('admin_token');
+      try {
+        const res = await fetch('/api/admin/bot-logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${activeToken}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'שגיאה בניתוק החשבון');
+
+        botActionFeedback.textContent = data.message || 'החשבון נותק ונמחק לחלוטין! ✅';
+        botActionFeedback.className = 'form-feedback success';
+        
+        // Refresh status to show new clean QR
+        setTimeout(loadBotStatus, 1500);
+      } catch (err) {
+        botActionFeedback.textContent = err.message || 'שגיאה בניתוק';
+        botActionFeedback.className = 'form-feedback error';
+      }
+    });
+
     // Send Test Message
     testMessageBtn.addEventListener('click', async () => {
       botActionFeedback.textContent = 'שולח הודעת בדיקה...';
       botActionFeedback.className = 'form-feedback';
       botActionFeedback.style.display = 'block';
 
+      const activeToken = token || sessionStorage.getItem('admin_token');
       try {
         const res = await fetch('/api/admin/send-test', {
           method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
+          headers: { 'Authorization': `Bearer ${activeToken}` }
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'שגיאה בשליחה');
