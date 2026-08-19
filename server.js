@@ -178,6 +178,19 @@ app.post('/api/admin/bot-restart', checkAuth, async (req, res) => {
   }
 });
 
+// Request 8-character Pairing Code
+app.post('/api/admin/request-pairing-code', checkAuth, async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ message: 'נא להזין מספר טלפון' });
+
+    const code = await bot.requestPairingCode(phone);
+    res.json({ success: true, code });
+  } catch (err) {
+    res.status(500).json({ message: err.message || 'שגיאה ביצירת קוד קישור' });
+  }
+});
+
 // Logout and Wipe WhatsApp Session completely
 app.post('/api/admin/bot-logout', checkAuth, async (req, res) => {
   try {

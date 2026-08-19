@@ -134,6 +134,23 @@
           <div class="qr-box">
             <img id="qrImage" src="" alt="WhatsApp QR Code">
           </div>
+
+          <div style="margin: 20px auto; max-width: 400px; padding-top: 15px; border-top: 1px solid #EFE8E0;">
+            <p style="font-weight: bold; margin-bottom: 8px;">🔗 או התחבר באמצעות קוד קישור לטלפון (בלי סריקה):</p>
+            <p class="hint-text" style="margin-bottom: 12px;">הזן את מספר הטלפון שלך וקבל קוד 8 תווים להזנה ישירה בוואטסאפ</p>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+              <input type="tel" id="pairingPhone" placeholder="050-1234567" style="padding: 10px 14px; border: 1px solid #D5C8B8; border-radius: 8px; font-size: 1rem; width: 180px; text-align: center;">
+              <button type="button" id="getPairingCodeBtn" class="submit-btn" style="background: var(--accent-terracotta); padding: 10px 18px;">
+                📲 קבל קוד קישור
+              </button>
+            </div>
+            
+            <div id="pairingCodeDisplay" style="display: none; margin-top: 16px; padding: 16px; background: #FFF8E7; border: 2px dashed #E67E22; border-radius: 12px; animation: fadeIn 0.4s;">
+              <p style="margin: 0; font-weight: bold; color: #D35400;">הזן את הקוד הבא בוואטסאפ בטלפון שלך:</p>
+              <div id="pairingCodeValue" style="font-size: 2.2rem; letter-spacing: 6px; font-weight: 900; color: #2C3E50; margin: 12px 0;"></div>
+              <p class="hint-text" style="color: #666;">בטלפון: מכשירים מקושרים ➜ קישור מכשיר ➜ <strong>קישור באמצעות מספר הטלפון</strong> בתחתית המסך</p>
+            </div>
+          </div>
         </div>
 
         <div style="display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap;">
@@ -368,6 +385,55 @@
       } catch (e) {}
 
       setTimeout(loadBotStatus, 1500);
+    });
+
+    // Request Pairing Code Handler
+    const getPairingCodeBtn = document.getElementById('getPairingCodeBtn');
+    const pairingPhoneInput = document.getElementById('pairingPhone');
+    const pairingCodeDisplay = document.getElementById('pairingCodeDisplay');
+    const pairingCodeValue = document.getElementById('pairingCodeValue');
+
+    getPairingCodeBtn.addEventListener('click', async () => {
+      const phone = pairingPhoneInput.value.trim();
+      if (!phone) {
+        alert('אנא הזינו מספר טלפון');
+        return;
+      }
+
+      getPairingCodeBtn.disabled = true;
+      getPairingCodeBtn.textContent = 'מייצר קוד... ⏳';
+
+      const activeToken = token || sessionStorage.getItem('admin_token');
+      try {
+        const res = await fetch('/api/admin/request-pairing-code', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${activeToken}` 
+          },
+          body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'שגיאה ביצירת קוד קישור');
+
+        pairingCodeValue.textContent = data.code;
+        pairingCodeDisplay.style.display = 'block';
+        
+        // Poll status to catch connection when user enters code on phone
+        const pollTimer = setInterval(async () => {
+          await loadBotStatus();
+          if (botStatusBadge.textContent.includes('מחובר')) {
+            clearInterval(pollTimer);
+            pairingCodeDisplay.style.display = 'none';
+          }
+        }, 3000);
+
+      } catch (err) {
+        alert(err.message || 'שגיאה ביצירת קוד');
+      } finally {
+        getPairingCodeBtn.disabled = false;
+        getPairingCodeBtn.textContent = '📲 קבל קוד קישור';
+      }
     });
 
     // Disconnect WhatsApp & Wipe Session Handler

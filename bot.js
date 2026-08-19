@@ -89,6 +89,25 @@ class WhatsAppBot {
     };
   }
 
+  async requestPairingCode(rawPhone) {
+    if (!this.sock) {
+      await this.initialize();
+    }
+
+    let phone = rawPhone.replace(/[^0-9]/g, '');
+    if (phone.startsWith('0')) {
+      phone = '972' + phone.substring(1);
+    }
+
+    if (phone.length < 9) {
+      throw new Error('מספר טלפון לא תקין. אנא הזינו מספר מלא, למשל 0501234567');
+    }
+
+    console.log(`📲 מבקש Pairing Code עבור מספר: ${phone}`);
+    const code = await this.sock.requestPairingCode(phone);
+    return code;
+  }
+
   async logoutAndWipeSession() {
     console.log('🧹 מתחיל ניתוק ומחיקה מלאה של נתוני הוואטסאפ...');
     try {
