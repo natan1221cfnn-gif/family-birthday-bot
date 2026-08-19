@@ -354,7 +354,21 @@
       }
     }
 
-    checkBotBtn.addEventListener('click', loadBotStatus);
+    checkBotBtn.addEventListener('click', async () => {
+      botActionFeedback.textContent = 'מרענן סטטוס ומאתחל מחדש במידת הצורך... 🔄';
+      botActionFeedback.className = 'form-feedback';
+      botActionFeedback.style.display = 'block';
+
+      const activeToken = token || sessionStorage.getItem('admin_token');
+      try {
+        await fetch('/api/admin/bot-restart', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${activeToken}` }
+        });
+      } catch (e) {}
+
+      setTimeout(loadBotStatus, 1500);
+    });
 
     // Disconnect WhatsApp & Wipe Session Handler
     disconnectBotBtn.addEventListener('click', async () => {

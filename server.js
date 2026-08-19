@@ -162,9 +162,15 @@ app.post('/api/admin/config', checkAuth, (req, res) => {
   res.json({ message: 'הגדרות נשמרו בהצלחה', config: current });
 });
 
-// Bot Status
-app.get('/api/admin/bot-status', checkAuth, (req, res) => {
-  res.json(bot.getStatus());
+// Restart Bot / Request fresh QR
+app.post('/api/admin/bot-restart', checkAuth, async (req, res) => {
+  try {
+    console.log('🔄 מפעיל מחדש את לקוח הוואטסאפ...');
+    await bot.initialize();
+    res.json({ message: 'מאתחל את לקוח הוואטסאפ...' });
+  } catch (err) {
+    res.status(500).json({ message: err.message || 'שגיאה באתחול' });
+  }
 });
 
 // Logout and Wipe WhatsApp Session completely
