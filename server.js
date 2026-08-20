@@ -152,74 +152,75 @@ app.get('/api/birthdays', (req, res) => {
 
 // Add a new birthday from the landing page
 app.post('/api/birthdays', (req, res) => {
-  const { 
-    name, 
-    dateType, 
-    day, 
-    month, 
-    year, 
-    hebrewDay, 
-    hebrewMonth, 
-    hebrewYear, 
-    gender, 
-    reminderType, 
-    relation, 
-    customWish 
-  } = req.body;
+  try {
+    const { 
+      name, 
+      dateType, 
+      day, 
+      month, 
+      hebrewDay, 
+      hebrewMonth, 
+      gender, 
+      reminderType, 
+      relation, 
+      customWish 
+    } = req.body;
 
-  if (!name || !name.trim()) {
-    return res.status(400).json({ message: 'נא להזין שם' });
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: 'נא להזין שם' });
+    }
+
+    let finalDay = day ? parseInt(day, 10) : null;
+    let finalMonth = month ? parseInt(month, 10) : null;
+
+    let finalHebDay = hebrewDay ? parseInt(hebrewDay, 10) : null;
+    let finalHebMonth = hebrewMonth || null;
+    let finalHebDateStr = '';
+
+    // If user entered Hebrew date
+    if (dateType === 'hebrew' && finalHebDay && finalHebMonth) {
+      const gregInfo = convertHebrewToGregorian(finalHebDay, finalHebMonth, 5784);
+      finalDay = gregInfo.day;
+      finalMonth = gregInfo.month;
+      finalHebDateStr = `${toGematriya(finalHebDay)} ב${finalHebMonth}`;
+    } else if (finalDay && finalMonth) {
+      // User entered Gregorian date -> calculate Hebrew
+      const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, 2024);
+      finalHebDay = hebInfo.hebrewDay;
+      finalHebMonth = hebInfo.hebrewMonth;
+      finalHebDateStr = hebInfo.hebrewDateStr;
+    } else {
+      return res.status(400).json({ message: 'נא לבחור תאריך יום הולדת תקין' });
+    }
+
+    const list = getBirthdays();
+    const config = getConfig();
+    const fallbackWish = config.defaultWish || "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨";
+
+    const newEntry = {
+      id: 'bday_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      name: name.trim(),
+      gender: gender || 'unspecified',
+      day: finalDay,
+      month: finalMonth,
+      hebrewDay: finalHebDay,
+      hebrewMonth: finalHebMonth,
+      hebrewDateStr: finalHebDateStr,
+      reminderType: reminderType || (dateType === 'hebrew' ? 'hebrew' : 'gregorian'),
+      relation: relation ? relation.trim() : '',
+      customWish: (customWish && customWish.trim()) ? customWish.trim() : fallbackWish,
+      createdAt: new Date().toISOString()
+    };
+
+    list.push(newEntry);
+    saveBirthdays(list);
+
+    console.log(`[API] 🎉 יום הולדת חדש נוסף: ${newEntry.name} (${newEntry.day}/${newEntry.month} | ${newEntry.hebrewDateStr})`);
+    res.status(201).json({ message: 'נוסף בהצלחה', entry: newEntry });
+  } catch (err) {
+    console.error('Error in POST /api/birthdays:', err);
+    res.status(500).json({ message: err.message || 'שגיאה פנימית בשמירת יום ההולדת', error: err.toString() });
   }
-
-  let finalDay = day ? parseInt(day, 10) : null;
-  let finalMonth = month ? parseInt(month, 10) : null;
-  let finalYear = year ? parseInt(year, 10) : null;
-
-  let finalHebDay = hebrewDay ? parseInt(hebrewDay, 10) : null;
-  let finalHebMonth = hebrewMonth || null;
-  let finalHebYear = hebrewYear ? parseInt(hebrewYear, 10) : null;
-  let finalHebDateStr = '';
-
-  // If user entered Hebrew date
-  if (dateType === 'hebrew' && finalHebDay && finalHebMonth) {
-    const gregInfo = convertHebrewToGregorian(finalHebDay, finalHebMonth, 5784);
-    finalDay = gregInfo.day;
-    finalMonth = gregInfo.month;
-    finalHebDateStr = `${toGematriya(finalHebDay)} ב${finalHebMonth}`;
-  } else if (finalDay && finalMonth) {
-    // User entered Gregorian date -> calculate Hebrew
-    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, 2024);
-    finalHebDay = hebInfo.hebrewDay;
-    finalHebMonth = hebInfo.hebrewMonth;
-    finalHebDateStr = hebInfo.hebrewDateStr;
-  } else {
-    return res.status(400).json({ message: 'נא לבחור תאריך יום הולדת תקין' });
-  }
-
-  const list = getBirthdays();
-  const config = getConfig();
-  const fallbackWish = config.defaultWish || "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨";
-
-  const newEntry = {
-    id: 'bday_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-    name: name.trim(),
-    gender: gender || 'unspecified',
-    day: finalDay,
-    month: finalMonth,
-    hebrewDay: finalHebDay,
-    hebrewMonth: finalHebMonth,
-    hebrewDateStr: finalHebDateStr,
-    reminderType: reminderType || (dateType === 'hebrew' ? 'hebrew' : 'gregorian'),
-    relation: relation ? relation.trim() : '',
-    customWish: (customWish && customWish.trim()) ? customWish.trim() : fallbackWish,
-    createdAt: new Date().toISOString()
-  };
-
-  list.push(newEntry);
-  saveBirthdays(list);
-
-  console.log(`[API] 🎉 יום הולדת חדש נוסף: ${newEntry.name} (${newEntry.day}/${newEntry.month} | ${newEntry.hebrewDateStr})`);
-  res.status(201).json({ message: 'נוסף בהצלחה', entry: newEntry });
 });
 
 // ----------------------------------------------------
