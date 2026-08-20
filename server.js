@@ -266,16 +266,27 @@ app.post('/api/admin/config', checkAuth, (req, res) => {
   const { groupName, notificationHour, notificationMinute, messageTemplate, defaultWish } = req.body;
   const current = getConfig();
 
-  current.groupName = groupName || current.groupName;
-  current.notificationHour = notificationHour !== undefined ? notificationHour : current.notificationHour;
-  current.notificationMinute = notificationMinute !== undefined ? notificationMinute : current.notificationMinute;
-  current.messageTemplate = messageTemplate !== undefined ? messageTemplate : current.messageTemplate;
-  current.defaultWish = defaultWish !== undefined ? defaultWish : current.defaultWish;
+  if (groupName !== undefined && groupName !== null) {
+    current.groupName = groupName.trim();
+  }
+  if (notificationHour !== undefined && notificationHour !== null && !isNaN(notificationHour)) {
+    current.notificationHour = parseInt(notificationHour, 10);
+  }
+  if (notificationMinute !== undefined && notificationMinute !== null && !isNaN(notificationMinute)) {
+    current.notificationMinute = parseInt(notificationMinute, 10);
+  }
+  if (messageTemplate !== undefined && messageTemplate !== null) {
+    current.messageTemplate = messageTemplate;
+  }
+  if (defaultWish !== undefined && defaultWish !== null) {
+    current.defaultWish = defaultWish.trim();
+  }
 
   saveConfig(current);
   scheduleDailyJob(); // Reschedule with new time
+  console.log(`[Config] ⚙️ הגדרות עודכנו: קבוצה="${current.groupName}", שעה=${current.notificationHour}:${current.notificationMinute}`);
 
-  res.json({ message: 'הגדרות נשמרו בהצלחה', config: current });
+  res.json({ message: 'ההגדרות נשמרו בהצלחה! ✅', config: current });
 });
 
 // Bot Status

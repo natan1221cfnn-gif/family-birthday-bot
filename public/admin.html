@@ -681,18 +681,30 @@
 
     // Load Config
     async function loadConfig() {
+      const activeToken = token || sessionStorage.getItem('admin_token');
       try {
-        const res = await fetch('/api/admin/config', {
-          headers: { 'Authorization': `Bearer ${token}` }
+        const res = await fetch(`/api/admin/config?t=${Date.now()}`, {
+          headers: { 'Authorization': `Bearer ${activeToken}` }
         });
+        if (!res.ok) return;
         const cfg = await res.json();
-        document.getElementById('groupName').value = cfg.groupName || '';
-        document.getElementById('notificationHour').value = cfg.notificationHour || 8;
-        document.getElementById('notificationMinute').value = cfg.notificationMinute || 30;
-        document.getElementById('defaultWish').value = cfg.defaultWish || '';
-        document.getElementById('messageTemplate').value = cfg.messageTemplate || '';
+        if (cfg.groupName !== undefined && cfg.groupName !== null) {
+          document.getElementById('groupName').value = cfg.groupName;
+        }
+        if (cfg.notificationHour !== undefined && cfg.notificationHour !== null) {
+          document.getElementById('notificationHour').value = cfg.notificationHour;
+        }
+        if (cfg.notificationMinute !== undefined && cfg.notificationMinute !== null) {
+          document.getElementById('notificationMinute').value = cfg.notificationMinute;
+        }
+        if (cfg.defaultWish !== undefined && cfg.defaultWish !== null) {
+          document.getElementById('defaultWish').value = cfg.defaultWish;
+        }
+        if (cfg.messageTemplate !== undefined && cfg.messageTemplate !== null) {
+          document.getElementById('messageTemplate').value = cfg.messageTemplate;
+        }
       } catch (err) {
-        console.error(err);
+        console.error('Error loading config:', err);
       }
     }
 
@@ -705,24 +717,30 @@
       const defaultWish = document.getElementById('defaultWish').value.trim();
       const messageTemplate = document.getElementById('messageTemplate').value;
 
+      const activeToken = token || sessionStorage.getItem('admin_token');
       try {
         const res = await fetch('/api/admin/config', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${activeToken}`
           },
           body: JSON.stringify({ groupName, notificationHour, notificationMinute, defaultWish, messageTemplate })
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'שגיאה בשמירה');
 
-        configFeedback.textContent = 'ההגדרות נשמרו בהצלחה! ✅';
+        configFeedback.textContent = 'ההגדרות נשמרו בהצלחה בשרת! ✅';
         configFeedback.className = 'form-feedback success';
+        configFeedback.style.display = 'block';
         setTimeout(() => configFeedback.style.display = 'none', 4000);
+
+        // Immediately reload config from server to ensure perfect sync
+        await loadConfig();
       } catch (err) {
-        configFeedback.textContent = err.message;
+        configFeedback.textContent = err.message || 'שגיאה בשמירה';
         configFeedback.className = 'form-feedback error';
+        configFeedback.style.display = 'block';
       }
     });
 
