@@ -1,4 +1,4 @@
-// Hebrew Month Names
+// Hebrew Month Names (Gregorian months in Hebrew)
 const HEBREW_MONTHS = [
   'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
   'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
@@ -9,6 +9,167 @@ const HEBREW_NUMERALS = [
   "י\"א", "י\"ב", "י\"ג", "י\"ד", "ט\"ו", "ט\"ז", "י\"ז", "י\"ח", "י\"ט", "כ'",
   "כ\"א", "כ\"ב", "כ\"ג", "כ\"ד", "כ\"ה", "כ\"ו", "כ\"ז", "כ\"ח", "כ\"ט", "ל'"
 ];
+
+// Client-side Jewish Calendar Engine
+function isHebrewLeapYear(year) {
+  return ((7 * year + 1) % 19) < 7;
+}
+
+function hebrewRoshHashanaJdn(year) {
+  const monthsElapsed = Math.floor((235 * year - 234) / 19);
+  const partsElapsed = 31524 + 765433 * monthsElapsed;
+  let day = Math.floor(partsElapsed / 25920);
+  const parts = partsElapsed % 25920;
+
+  if (parts >= 19440) day += 1;
+  let dow = day % 7;
+  if (dow === 0 || dow === 3 || dow === 5) {
+    day += 1;
+  } else if (dow === 2 && parts >= 9924 && !isHebrewLeapYear(year)) {
+    day += 2;
+  } else if (dow === 1 && parts >= 16789 && isHebrewLeapYear(year - 1)) {
+    day += 1;
+  }
+  return day + 347997;
+}
+
+function getDaysInHebrewYear(year) {
+  return hebrewRoshHashanaJdn(year + 1) - hebrewRoshHashanaJdn(year);
+}
+
+function getDaysInHebrewMonth(year, monthIndex) {
+  const isLeap = isHebrewLeapYear(year);
+  const yearLength = getDaysInHebrewYear(year);
+
+  if (monthIndex === 0) return 30; // Tishrei
+  if (monthIndex === 1) return (yearLength === 355 || yearLength === 385) ? 30 : 29; // Cheshvan
+  if (monthIndex === 2) return (yearLength === 353 || yearLength === 383) ? 29 : 30; // Kislev
+  if (monthIndex === 3) return 29; // Tevet
+  if (monthIndex === 4) return 30; // Shvat
+
+  if (isLeap) {
+    if (monthIndex === 5) return 30; // Adar I
+    if (monthIndex === 6) return 29; // Adar II
+    if (monthIndex === 7) return 30; // Nisan
+    if (monthIndex === 8) return 29; // Iyyar
+    if (monthIndex === 9) return 30; // Sivan
+    if (monthIndex === 10) return 29; // Tamuz
+    if (monthIndex === 11) return 30; // Av
+    if (monthIndex === 12) return 29; // Elul
+  } else {
+    if (monthIndex === 5) return 29; // Adar
+    if (monthIndex === 6) return 30; // Nisan
+    if (monthIndex === 7) return 29; // Iyyar
+    if (monthIndex === 8) return 30; // Sivan
+    if (monthIndex === 9) return 29; // Tamuz
+    if (monthIndex === 10) return 30; // Av
+    if (monthIndex === 11) return 29; // Elul
+  }
+  return 29;
+}
+
+function julianToGregorian(jdn) {
+  let a = jdn + 32044;
+  let b = Math.floor((4 * a + 3) / 146097);
+  let c = a - Math.floor((146097 * b) / 4);
+  let d = Math.floor((4 * c + 3) / 1461);
+  let e = c - Math.floor((1461 * d) / 4);
+  let m = Math.floor((5 * e + 2) / 153);
+
+  let day = e - Math.floor((153 * m + 2) / 5) + 1;
+  let month = m + 3 - 12 * Math.floor(m / 10);
+  let year = 100 * b + d - 4800 + Math.floor(m / 10);
+  return { day, month, year };
+}
+
+function gregorianToJulian(year, month, day) {
+  let a = Math.floor((14 - month) / 12);
+  let y = year + 4800 - a;
+  let m = month + 12 * a - 3;
+  return day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+}
+
+function normalizeHebrewMonth(str) {
+  if (!str) return 'תשרי';
+  const clean = str.toString().trim().toLowerCase();
+  const map = {
+    'tishrei': 'תשרי', 'תשרי': 'תשרי',
+    'cheshvan': 'חשוון', 'חשוון': 'חשוון', 'חשון': 'חשוון', 'marcheshvan': 'חשוון', 'מרחשוון': 'חשוון',
+    'kislev': 'כסלו', 'כסלו': 'כסלו', 'כסליו': 'כסלו',
+    'tevet': 'טבת', 'טבת': 'טבת',
+    'shvat': 'שבט', "sh'vat": 'שבט', 'שבט': 'שבט',
+    'adar': 'אדר', 'אדר': 'אדר', 'adar 1': "אדר א'", 'adar 2': "אדר ב'",
+    'אדר א': "אדר א'", "אדר א'": "אדר א'",
+    'אדר ב': "אדר ב'", "אדר ב'": "אדר ב'",
+    'nisan': 'ניסן', 'ניסן': 'ניסן',
+    'iyyar': 'אייר', 'אייר': 'אייר', 'איר': 'אייר',
+    'sivan': 'סיוון', 'סיוון': 'סיוון', 'סיון': 'סיוון',
+    'tamuz': 'תמוז', 'tammuz': 'תמוז', 'תמוז': 'תמוז',
+    'av': 'אב', 'אב': 'אב', 'menachem av': 'אב', 'מנחם אב': 'אב',
+    'elul': 'אלול', 'אלול': 'אלול'
+  };
+  return map[clean] || map[str.toString().trim()] || 'תשרי';
+}
+
+function convertHebrewToGregorian(hebrewDay, hebrewMonthInput, hebrewYearInput) {
+  const normMonth = normalizeHebrewMonth(hebrewMonthInput);
+  const hYear = parseInt(hebrewYearInput, 10) || 5784;
+  const hDay = parseInt(hebrewDay, 10) || 1;
+
+  const isLeap = isHebrewLeapYear(hYear);
+  const monthNames = isLeap
+    ? ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר א'", "אדר ב'", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]
+    : ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
+
+  let mIndex = monthNames.indexOf(normMonth);
+  if (mIndex === -1) {
+    if (normMonth === "אדר א'" || normMonth === "אדר ב'") mIndex = 5;
+    else mIndex = 0;
+  }
+
+  let jdn = hebrewRoshHashanaJdn(hYear);
+  for (let i = 0; i < mIndex; i++) {
+    jdn += getDaysInHebrewMonth(hYear, i);
+  }
+  jdn += (hDay - 1);
+  return julianToGregorian(jdn);
+}
+
+function convertGregorianToHebrew(day, month, year) {
+  const gYear = year ? parseInt(year, 10) : 2024;
+  const gMonth = parseInt(month, 10);
+  const gDay = parseInt(day, 10);
+
+  const jdn = gregorianToJulian(gYear, gMonth, gDay);
+
+  let hYear = gYear + 3760;
+  while (hebrewRoshHashanaJdn(hYear + 1) <= jdn) {
+    hYear++;
+  }
+  while (hebrewRoshHashanaJdn(hYear) > jdn) {
+    hYear--;
+  }
+
+  let daysSinceRH = jdn - hebrewRoshHashanaJdn(hYear);
+  let mIndex = 0;
+  while (true) {
+    let dim = getDaysInHebrewMonth(hYear, mIndex);
+    if (daysSinceRH < dim) break;
+    daysSinceRH -= dim;
+    mIndex++;
+  }
+
+  const isLeap = isHebrewLeapYear(hYear);
+  const monthNames = isLeap
+    ? ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר א'", "אדר ב'", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]
+    : ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
+
+  return {
+    hebrewDay: daysSinceRH + 1,
+    hebrewMonth: monthNames[mIndex],
+    hebrewYear: hYear
+  };
+}
 
 let allBirthdays = [];
 let currentCalendarType = 'gregorian';
@@ -303,29 +464,58 @@ function getBirthdayCalculations(item) {
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
   const currentDay = now.getDate();
+  const todayMidnight = new Date(currentYear, currentMonth - 1, currentDay);
 
-  // Create Date object for this year's birthday
-  let bdayThisYear = new Date(currentYear, item.month - 1, item.day);
-  let today = new Date(currentYear, currentMonth - 1, currentDay);
-
-  let isToday = (item.month === currentMonth && item.day === currentDay);
-  
+  let isToday = false;
+  let diffDays = 0;
   let targetYear = currentYear;
-  if (bdayThisYear < today && !isToday) {
-    targetYear = currentYear + 1;
-  }
 
-  let nextBday = new Date(targetYear, item.month - 1, item.day);
-  const diffTime = nextBday.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  if (item.reminderType === 'hebrew' && item.hebrewDay && item.hebrewMonth) {
+    // Hebrew countdown calculation
+    const todayHeb = convertGregorianToHebrew(currentDay, currentMonth, currentYear);
+    const normMonth = normalizeHebrewMonth(item.hebrewMonth);
+    
+    // Check if today is Hebrew birthday
+    if (todayHeb.hebrewDay === item.hebrewDay && todayHeb.hebrewMonth === normMonth) {
+      isToday = true;
+      diffDays = 0;
+    } else {
+      let hYear = todayHeb.hebrewYear;
+      let gregThisHebYear = convertHebrewToGregorian(item.hebrewDay, normMonth, hYear);
+      let targetDate = new Date(gregThisHebYear.year, gregThisHebYear.month - 1, gregThisHebYear.day);
+
+      if (targetDate < todayMidnight) {
+        // Hebrew birthday already occurred this Hebrew year -> next occurrence is in hYear + 1
+        let gregNextHebYear = convertHebrewToGregorian(item.hebrewDay, normMonth, hYear + 1);
+        targetDate = new Date(gregNextHebYear.year, gregNextHebYear.month - 1, gregNextHebYear.day);
+      }
+
+      const diffTime = targetDate.getTime() - todayMidnight.getTime();
+      diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    }
+  } else {
+    // Gregorian countdown calculation
+    isToday = (item.month === currentMonth && item.day === currentDay);
+    let bdayThisYear = new Date(currentYear, item.month - 1, item.day);
+    
+    if (bdayThisYear < todayMidnight && !isToday) {
+      targetYear = currentYear + 1;
+    }
+    let nextBday = new Date(targetYear, item.month - 1, item.day);
+    const diffTime = nextBday.getTime() - todayMidnight.getTime();
+    diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  }
 
   let age = null;
   if (item.year) {
     age = targetYear - item.year;
+  } else if (item.hebrewYear) {
+    const todayHeb = convertGregorianToHebrew(currentDay, currentMonth, currentYear);
+    age = todayHeb.hebrewYear - item.hebrewYear;
   }
 
   let genderAgeLabel = '';
-  if (age) {
+  if (age && age > 0) {
     if (item.gender === 'female') {
       genderAgeLabel = isToday ? `בת ${age}` : `תהיה בת ${age}`;
     } else if (item.gender === 'male') {
