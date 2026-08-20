@@ -102,10 +102,11 @@
               <button type="button" class="tab-btn active" id="tabGregorian" onclick="switchCalendarType('gregorian')">📅 תאריך לועזי</button>
               <button type="button" class="tab-btn" id="tabHebrew" onclick="switchCalendarType('hebrew')">📜 תאריך עברי</button>
             </div>
+            <p class="hint-text" style="color: var(--accent-terracotta); font-weight: 600; margin-top: 6px;">💡 ההתראה בוואטסאפ תישלח אוטומטית לפי סוג התאריך שתבחרו כאן (עברי או לועזי).</p>
           </div>
 
           <!-- Gregorian Inputs Container -->
-          <div id="gregorianDateWrap" class="form-row date-row">
+          <div id="gregorianDateWrap" class="form-row date-row" style="grid-template-columns: 1fr 1fr;">
             <div class="form-group">
               <label for="birthDay">יום <span class="required">*</span></label>
               <select id="birthDay" name="day">
@@ -132,22 +133,10 @@
                 <option value="12">דצמבר (12)</option>
               </select>
             </div>
-
-            <div class="form-group">
-              <label for="birthYear">שנת לידה <span class="required">*</span></label>
-              <input 
-                type="number" 
-                id="birthYear" 
-                name="year" 
-                placeholder="למשל 1995" 
-                min="1920" 
-                max="2030"
-              >
-            </div>
           </div>
 
           <!-- Hebrew Inputs Container -->
-          <div id="hebrewDateWrap" class="form-row date-row" style="display: none;">
+          <div id="hebrewDateWrap" class="form-row date-row" style="grid-template-columns: 1fr 1fr; display: none;">
             <div class="form-group">
               <label for="hebrewDay">יום עברי <span class="required">*</span></label>
               <select id="hebrewDay" name="hebrewDay">
@@ -175,31 +164,6 @@
                 <option value="אב">אב</option>
                 <option value="אלול">אלול</option>
               </select>
-            </div>
-
-            <div class="form-group">
-              <label for="hebrewYear">שנת לידה עברית <span class="required">*</span></label>
-              <input 
-                type="text" 
-                id="hebrewYear" 
-                name="hebrewYear" 
-                placeholder="למשל: תשפ''ג או 2023"
-              >
-            </div>
-          </div>
-
-          <!-- Reminder Preference -->
-          <div class="form-group">
-            <label>מתי תרצו לקבל את הברכה בוואטסאפ? <span class="required">*</span></label>
-            <div class="reminder-toggle-wrap">
-              <label class="reminder-option">
-                <input type="radio" name="reminderType" value="hebrew">
-                <span class="reminder-btn">📜 בתאריך העברי</span>
-              </label>
-              <label class="reminder-option">
-                <input type="radio" name="reminderType" value="gregorian" checked>
-                <span class="reminder-btn">📅 בתאריך הלועזי</span>
-              </label>
             </div>
           </div>
 

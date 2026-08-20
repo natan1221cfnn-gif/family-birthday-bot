@@ -210,23 +210,30 @@
             <div class="form-group">
               <label for="notificationHour">שעת שליחה</label>
               <select id="notificationHour" name="notificationHour">
-                <option value="6">06:00</option>
-                <option value="7">07:00</option>
-                <option value="8" selected>08:00</option>
-                <option value="9">09:00</option>
-                <option value="10">10:00</option>
-                <option value="11">11:00</option>
+                <option value="0">00:00 (חצות / 12 בלילה)</option>
+                <option value="1">01:00 (לילה)</option>
+                <option value="2">02:00 (לילה)</option>
+                <option value="3">03:00 (לילה)</option>
+                <option value="4">04:00 (לפנות בוקר)</option>
+                <option value="5">05:00 (לפנות בוקר)</option>
+                <option value="6">06:00 (בוקר)</option>
+                <option value="7">07:00 (בוקר)</option>
+                <option value="8" selected>08:00 (בוקר)</option>
+                <option value="9">09:00 (בוקר)</option>
+                <option value="10">10:00 (בוקר)</option>
+                <option value="11">11:00 (לפני הצהריים)</option>
                 <option value="12">12:00 (צהריים)</option>
-                <option value="13">13:00</option>
-                <option value="14">14:00</option>
-                <option value="15">15:00</option>
-                <option value="16">16:00</option>
-                <option value="17">17:00</option>
-                <option value="18">18:00</option>
-                <option value="19">19:00</option>
-                <option value="20">20:00</option>
-                <option value="21">21:00</option>
-                <option value="22">22:00</option>
+                <option value="13">13:00 (צהריים)</option>
+                <option value="14">14:00 (צהריים)</option>
+                <option value="15">15:00 (אחר הצהריים)</option>
+                <option value="16">16:00 (אחר הצהריים)</option>
+                <option value="17">17:00 (אחר הצהריים)</option>
+                <option value="18">18:00 (ערב)</option>
+                <option value="19">19:00 (ערב)</option>
+                <option value="20">20:00 (ערב)</option>
+                <option value="21">21:00 (לילה)</option>
+                <option value="22">22:00 (לילה)</option>
+                <option value="23">23:00 (11 בלילה)</option>
               </select>
             </div>
             <div class="form-group">
@@ -316,10 +323,11 @@
             <button type="button" class="tab-btn active" id="editTabGregorian" onclick="switchEditCalendarType('gregorian')">📅 תאריך לועזי</button>
             <button type="button" class="tab-btn" id="editTabHebrew" onclick="switchEditCalendarType('hebrew')">📜 תאריך עברי</button>
           </div>
+          <p class="hint-text" style="color: var(--accent-terracotta); font-weight: 600; margin-top: 6px;">💡 ההתראה בוואטסאפ תישלח אוטומטית לפי סוג התאריך שייבחר כאן (עברי או לועזי).</p>
         </div>
 
         <!-- Edit Gregorian Inputs -->
-        <div id="editGregorianDateWrap" class="form-row date-row">
+        <div id="editGregorianDateWrap" class="form-row date-row" style="grid-template-columns: 1fr 1fr;">
           <div class="form-group">
             <label for="editBirthDay">יום לועזי</label>
             <select id="editBirthDay"></select>
@@ -341,14 +349,10 @@
               <option value="12">דצמבר (12)</option>
             </select>
           </div>
-          <div class="form-group">
-            <label for="editBirthYear">שנת לידה</label>
-            <input type="number" id="editBirthYear" placeholder="1995">
-          </div>
         </div>
 
         <!-- Edit Hebrew Inputs -->
-        <div id="editHebrewDateWrap" class="form-row date-row" style="display: none;">
+        <div id="editHebrewDateWrap" class="form-row date-row" style="grid-template-columns: 1fr 1fr; display: none;">
           <div class="form-group">
             <label for="editHebrewDay">יום עברי</label>
             <select id="editHebrewDay"></select>
@@ -362,6 +366,8 @@
               <option value="טבת">טבת</option>
               <option value="שבט">שבט</option>
               <option value="אדר">אדר</option>
+              <option value="אדר א'">אדר א'</option>
+              <option value="אדר ב'">אדר ב'</option>
               <option value="ניסן">ניסן</option>
               <option value="אייר">אייר</option>
               <option value="סיוון">סיוון</option>
@@ -369,25 +375,6 @@
               <option value="אב">אב</option>
               <option value="אלול">אלול</option>
             </select>
-          </div>
-          <div class="form-group">
-            <label for="editHebrewYear">שנה עברית</label>
-            <input type="text" id="editHebrewYear" placeholder="תשנ''ג">
-          </div>
-        </div>
-
-        <!-- Reminder Preference -->
-        <div class="form-group">
-          <label>מתי לשלוח את הברכה בוואטסאפ?</label>
-          <div class="reminder-toggle-wrap">
-            <label class="reminder-option">
-              <input type="radio" name="editReminderType" value="hebrew" id="editReminderHebrew">
-              <span class="reminder-btn">📜 בתאריך העברי</span>
-            </label>
-            <label class="reminder-option">
-              <input type="radio" name="editReminderType" value="gregorian" id="editReminderGregorian">
-              <span class="reminder-btn">📅 בתאריך הלועזי</span>
-            </label>
           </div>
         </div>
 
@@ -757,10 +744,10 @@
               ${item.gender === 'female' ? '👧' : (item.gender === 'male' ? '👦' : '')}
               <span style="color: #666; font-size: 0.88rem;">(${item.relation || 'משפחה'})</span>
               <div style="font-size: 0.82rem; color: #777; margin-top: 2px;">
-                📅 ${item.day}/${item.month}${item.year ? '/' + item.year : ''}
+                📅 ${item.day}/${item.month}
                 ${item.hebrewDateStr ? ` • 📜 ${item.hebrewDateStr}` : ''}
                 <span style="background: ${item.reminderType === 'hebrew' ? '#FFF3E0' : '#E8F5E9'}; color: ${item.reminderType === 'hebrew' ? '#E65100' : '#2E7D32'}; padding: 1px 6px; border-radius: 8px; font-weight: 600; margin-right: 4px;">
-                  ${item.reminderType === 'hebrew' ? 'לפי עברי' : 'לפי לועזי'}
+                  ${item.reminderType === 'hebrew' ? 'לפי עברי 📜' : 'לפי לועזי 📅'}
                 </span>
               </div>
             </div>
@@ -814,18 +801,14 @@
       // Dates
       document.getElementById('editBirthDay').value = item.day || 1;
       document.getElementById('editBirthMonth').value = item.month || 1;
-      document.getElementById('editBirthYear').value = item.year || '';
 
       document.getElementById('editHebrewDay').value = item.hebrewDay || 1;
       document.getElementById('editHebrewMonth').value = item.hebrewMonth || 'תשרי';
-      document.getElementById('editHebrewYear').value = item.hebrewYear || '';
 
-      // Reminder Type
+      // Switch tab based on reminder preference
       if (item.reminderType === 'hebrew') {
-        document.getElementById('editReminderHebrew').checked = true;
         switchEditCalendarType('hebrew');
       } else {
-        document.getElementById('editReminderGregorian').checked = true;
         switchEditCalendarType('gregorian');
       }
 
@@ -852,15 +835,13 @@
       const id = document.getElementById('editPersonId').value;
       const name = document.getElementById('editPersonName').value.trim();
       const gender = document.querySelector('input[name="editGender"]:checked')?.value || 'male';
-      const reminderType = document.querySelector('input[name="editReminderType"]:checked')?.value || 'gregorian';
+      const reminderType = currentEditCalendarType;
       
       const day = document.getElementById('editBirthDay').value;
       const month = document.getElementById('editBirthMonth').value;
-      const year = document.getElementById('editBirthYear').value.trim();
 
       const hebrewDay = document.getElementById('editHebrewDay').value;
       const hebrewMonth = document.getElementById('editHebrewMonth').value;
-      const hebrewYear = document.getElementById('editHebrewYear').value.trim();
 
       const relation = document.getElementById('editPersonRelation').value.trim();
       const customWish = document.getElementById('editCustomWish').value.trim();
@@ -874,10 +855,8 @@
           dateType: currentEditCalendarType,
           day,
           month,
-          year,
           hebrewDay,
           hebrewMonth,
-          hebrewYear,
           reminderType,
           relation,
           customWish

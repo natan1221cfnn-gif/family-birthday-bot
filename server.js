@@ -181,20 +181,16 @@ app.post('/api/birthdays', (req, res) => {
 
   // If user entered Hebrew date
   if (dateType === 'hebrew' && finalHebDay && finalHebMonth) {
-    const gregInfo = convertHebrewToGregorian(finalHebDay, finalHebMonth, finalHebYear);
+    const gregInfo = convertHebrewToGregorian(finalHebDay, finalHebMonth, 5784);
     finalDay = gregInfo.day;
     finalMonth = gregInfo.month;
-    finalYear = gregInfo.year || null;
-
-    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, finalYear);
-    finalHebDateStr = hebInfo.hebrewDateStr;
+    finalHebDateStr = `${toGematriya(finalHebDay)} ב${finalHebMonth}`;
   } else if (finalDay && finalMonth) {
     // User entered Gregorian date -> calculate Hebrew
-    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, finalYear);
+    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, 2024);
     finalHebDay = hebInfo.hebrewDay;
     finalHebMonth = hebInfo.hebrewMonth;
     finalHebDateStr = hebInfo.hebrewDateStr;
-    finalHebYear = hebInfo.hebrewYear;
   } else {
     return res.status(400).json({ message: 'נא לבחור תאריך יום הולדת תקין' });
   }
@@ -209,12 +205,10 @@ app.post('/api/birthdays', (req, res) => {
     gender: gender || 'unspecified',
     day: finalDay,
     month: finalMonth,
-    year: finalYear,
     hebrewDay: finalHebDay,
     hebrewMonth: finalHebMonth,
     hebrewDateStr: finalHebDateStr,
-    hebrewYear: finalHebYear,
-    reminderType: reminderType || 'gregorian',
+    reminderType: reminderType || (dateType === 'hebrew' ? 'hebrew' : 'gregorian'),
     relation: relation ? relation.trim() : '',
     customWish: (customWish && customWish.trim()) ? customWish.trim() : fallbackWish,
     createdAt: new Date().toISOString()
@@ -388,19 +382,15 @@ app.put('/api/admin/birthdays/:id', checkAuth, (req, res) => {
   let finalHebDateStr = '';
 
   if (dateType === 'hebrew' && finalHebDay && finalHebMonth) {
-    const gregInfo = convertHebrewToGregorian(finalHebDay, finalHebMonth, finalHebYear);
+    const gregInfo = convertHebrewToGregorian(finalHebDay, finalHebMonth, 5784);
     finalDay = gregInfo.day;
     finalMonth = gregInfo.month;
-    finalYear = gregInfo.year || null;
-
-    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, finalYear);
-    finalHebDateStr = hebInfo.hebrewDateStr;
+    finalHebDateStr = `${toGematriya(finalHebDay)} ב${finalHebMonth}`;
   } else if (finalDay && finalMonth) {
-    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, finalYear);
+    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, 2024);
     finalHebDay = hebInfo.hebrewDay;
     finalHebMonth = hebInfo.hebrewMonth;
     finalHebDateStr = hebInfo.hebrewDateStr;
-    finalHebYear = hebInfo.hebrewYear;
   }
 
   list[index] = {
@@ -409,12 +399,10 @@ app.put('/api/admin/birthdays/:id', checkAuth, (req, res) => {
     gender: gender || list[index].gender || 'unspecified',
     day: finalDay || list[index].day,
     month: finalMonth || list[index].month,
-    year: finalYear,
     hebrewDay: finalHebDay,
     hebrewMonth: finalHebMonth,
     hebrewDateStr: finalHebDateStr,
-    hebrewYear: finalHebYear,
-    reminderType: reminderType || list[index].reminderType || 'gregorian',
+    reminderType: reminderType || (dateType === 'hebrew' ? 'hebrew' : 'gregorian'),
     relation: relation ? relation.trim() : '',
     customWish: customWish ? customWish.trim() : '',
     updatedAt: new Date().toISOString()

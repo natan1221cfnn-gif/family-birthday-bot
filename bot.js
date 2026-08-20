@@ -219,32 +219,29 @@ class WhatsAppBot {
       return;
     }
 
-    // 4. User is CHOOSING_OPTION (1-7)
+    // 4. User is CHOOSING_OPTION (1-6)
     if (session.step === 'CHOOSING_OPTION') {
-      const choice = text.replace(/[^1-7]/g, '');
+      const choice = text.replace(/[^1-6]/g, '');
       if (choice === '1') {
         session.step = 'UPDATING_NAME';
         await this.sock.sendMessage(fromJid, { text: `✏️ אנא שלח/י את *השם המלא החדש* (השם הנוכחי: ${currentPerson.name}):` });
       } else if (choice === '2') {
         session.step = 'UPDATING_GREG_DATE';
-        await this.sock.sendMessage(fromJid, { text: `📅 אנא שלח/י את *התאריך הלועזי המעודכן* בפורמט יום/חודש/שנה (למשל: 15/07/1995 או 28.7.2016):` });
+        await this.sock.sendMessage(fromJid, { text: `📅 אנא שלח/י את *התאריך הלועזי* בפורמט יום/חודש (למשל: 15/07 או 28.7):` });
       } else if (choice === '3') {
         session.step = 'UPDATING_HEB_DATE';
-        await this.sock.sendMessage(fromJid, { text: `📜 אנא שלח/י את *התאריך העברי המעודכן* (למשל: כ"א בתמוז תשנ"ג או ח' כסלו 2022):` });
+        await this.sock.sendMessage(fromJid, { text: `📜 אנא שלח/י את *התאריך העברי* (למשל: כ"א בתמוז או ט"ו בשבט):` });
       } else if (choice === '4') {
-        session.step = 'UPDATING_REMINDER';
-        await this.sock.sendMessage(fromJid, { text: `🔔 מתי תרצו לקבל את הברכה האוטומטית בוואטסאפ?\nהשב/י במספר:\n1️⃣ - בתאריך העברי 📜\n2️⃣ - בתאריך הלועזי 📅` });
-      } else if (choice === '5') {
         session.step = 'UPDATING_GENDER';
-        await this.sock.sendMessage(fromJid, { text: `👦/👧 מה הפנייה המתאימה?\nהשב/י במספר:\n1️⃣ - זכר (היקר שחוגג, בן X) 👦\n2️⃣ - נקבה (היקרה שחוגגת, בת X) 👧` });
-      } else if (choice === '6') {
+        await this.sock.sendMessage(fromJid, { text: `👦/👧 מה הפנייה המתאימה?\nהשב/י במספר:\n1️⃣ - זכר (היקר שחוגג) 👦\n2️⃣ - נקבה (היקרה שחוגגת) 👧` });
+      } else if (choice === '5') {
         session.step = 'UPDATING_RELATION';
         await this.sock.sendMessage(fromJid, { text: `👨‍👩‍👧 אנא שלח/י את *הקרבה במשפחה* המעודכנת (למשל: הבת של נאוה, הבן של יאיר):` });
-      } else if (choice === '7') {
+      } else if (choice === '6') {
         session.step = 'UPDATING_WISH';
         await this.sock.sendMessage(fromJid, { text: `💬 אנא שלח/י את *נוסח האיחול / הברכה האישית* החדש:` });
       } else {
-        await this.sock.sendMessage(fromJid, { text: `נא להשיב במספר בין 1 ל-7, או לשלוח *סיום*.` });
+        await this.sock.sendMessage(fromJid, { text: `נא להשיב במספר בין 1 ל-6, או לשלוח *סיום*.` });
       }
       return;
     }
@@ -257,55 +254,42 @@ class WhatsAppBot {
       this.saveBirthdays(list);
       await this.sendSuccessAndMenu(fromJid, list[pIndex], `השם עודכן ל-*${list[pIndex].name}*! ✅`);
     } else if (session.step === 'UPDATING_GREG_DATE') {
-      const match = text.match(/^(\d{1,2})[\/\.](\d{1,2})(?:[\/\.](\d{2,4}))?$/);
+      const match = text.match(/^(\d{1,2})[\/\.](\d{1,2})/);
       if (!match) {
-        await this.sock.sendMessage(fromJid, { text: `פורמט תאריך לא תקין. אנא שלח/י למשל: 15/07/1995 או 15.7.1995:` });
+        await this.sock.sendMessage(fromJid, { text: `פורמט תאריך לא תקין. אנא שלח/י למשל: 15/07 או 15.7:` });
         return;
       }
       let day = parseInt(match[1], 10);
       let month = parseInt(match[2], 10);
-      let year = match[3] ? parseInt(match[3], 10) : list[pIndex].year;
-      if (year && year < 100) year = year > 30 ? 1900 + year : 2000 + year;
 
-      const hConv = convertGregorianToHebrew(day, month, year);
+      const hConv = convertGregorianToHebrew(day, month, 2024);
       list[pIndex].day = day;
       list[pIndex].month = month;
-      list[pIndex].year = year || null;
       list[pIndex].hebrewDay = hConv.hebrewDay;
       list[pIndex].hebrewMonth = hConv.hebrewMonth;
       list[pIndex].hebrewDateStr = hConv.hebrewDateStr;
-      list[pIndex].hebrewYear = hConv.hebrewYear || null;
+      list[pIndex].reminderType = 'gregorian';
 
       this.saveBirthdays(list);
-      await this.sendSuccessAndMenu(fromJid, list[pIndex], `התאריך הלועזי עודכן ל-*${day}/${month}/${year || ''}* (עברי: ${hConv.hebrewDateStr})! ✅`);
+      await this.sendSuccessAndMenu(fromJid, list[pIndex], `התאריך עודכן ל-📅 *${day}/${month}* (עברי: ${hConv.hebrewDateStr}) והתזכורת הוגדרה לתאריך הלועזי! ✅`);
     } else if (session.step === 'UPDATING_HEB_DATE') {
       const parsedHeb = parseHebrewDateString(text);
       if (!parsedHeb || !parsedHeb.hebrewDay || !parsedHeb.hebrewMonth) {
-        await this.sock.sendMessage(fromJid, { text: `לא הצלחתי לפענח את התאריך העברי. אנא שלח/י למשל: כ"א בתמוז תשנ"ג או ח' כסלו 2022:` });
+        await this.sock.sendMessage(fromJid, { text: `לא הצלחתי לפענח את התאריך העברי. אנא שלח/י למשל: כ"א בתמוז או ט"ו בשבט:` });
         return;
       }
 
-      const hYear = parsedHeb.hebrewYear || list[pIndex].hebrewYear || (list[pIndex].year ? list[pIndex].year + 3760 : 5784);
-      const greg = convertHebrewToGregorian(parsedHeb.hebrewDay, parsedHeb.hebrewMonth, hYear);
+      const greg = convertHebrewToGregorian(parsedHeb.hebrewDay, parsedHeb.hebrewMonth, 5784);
 
       list[pIndex].hebrewDay = parsedHeb.hebrewDay;
       list[pIndex].hebrewMonth = parsedHeb.hebrewMonth;
-      list[pIndex].hebrewYear = parsedHeb.hebrewYear || null;
-      list[pIndex].hebrewDateStr = `${toGematriya(parsedHeb.hebrewDay)} ב${parsedHeb.hebrewMonth}${parsedHeb.hebrewYear ? ' ' + toGematriya(parsedHeb.hebrewYear) : ''}`;
+      list[pIndex].hebrewDateStr = `${toGematriya(parsedHeb.hebrewDay)} ב${parsedHeb.hebrewMonth}`;
       list[pIndex].day = greg.day;
       list[pIndex].month = greg.month;
-      if (parsedHeb.hebrewYear) list[pIndex].year = greg.year;
+      list[pIndex].reminderType = 'hebrew';
 
       this.saveBirthdays(list);
-      await this.sendSuccessAndMenu(fromJid, list[pIndex], `התאריך העברי עודכן ל-*${list[pIndex].hebrewDateStr}* (לועזי: ${greg.day}/${greg.month}/${greg.year || ''})! ✅`);
-    } else if (session.step === 'UPDATING_REMINDER') {
-      if (text.includes('1') || text.includes('עברי')) {
-        list[pIndex].reminderType = 'hebrew';
-      } else {
-        list[pIndex].reminderType = 'gregorian';
-      }
-      this.saveBirthdays(list);
-      await this.sendSuccessAndMenu(fromJid, list[pIndex], `העדפת התזכורת עודכנה ל-*${list[pIndex].reminderType === 'hebrew' ? 'תאריך עברי 📜' : 'תאריך לועזי 📅'}*! ✅`);
+      await this.sendSuccessAndMenu(fromJid, list[pIndex], `התאריך עודכן ל-📜 *${list[pIndex].hebrewDateStr}* (לועזי: ${greg.day}/${greg.month}) והתזכורת הוגדרה לתאריך העברי! ✅`);
     } else if (session.step === 'UPDATING_GENDER') {
       if (text.includes('2') || text.includes('נקבה') || text.includes('בת')) {
         list[pIndex].gender = 'female';
@@ -336,22 +320,21 @@ class WhatsAppBot {
 
 📋 *הפרטים הנוכחיים:*
 • 👤 *שם מלא:* ${person.name}
-• *פנייה/מגדר:* ${genderText}
-• 📅 *תאריך לועזי:* ${person.day}/${person.month}${person.year ? '/' + person.year : ''}
+• *פנייה:* ${genderText}
+• 📅 *תאריך לועזי:* ${person.day}/${person.month}
 • 📜 *תאריך עברי:* ${person.hebrewDateStr || 'לא הוגדר'}
-• 🔔 *העדפת תזכורת:* ${reminderText}
+• 🔔 *התראה בוואטסאפ:* ${reminderText}
 • 👨‍👩‍👧 *קרבה במשפחה:* ${person.relation || 'משפחה'}
 • 💬 *איחול אישי:* "${person.customWish || 'מאחלים לך שפע בריאות ושמחה!'}"
 
 ────────────────────────
 *מה תרצה/י לעדכן? (השב/י במספר):*
 1️⃣ - עדכון שם מלא
-2️⃣ - עדכון תאריך לועזי (יום/חודש/שנה)
-3️⃣ - עדכון תאריך עברי (יום/חודש/שנה)
-4️⃣ - שינוי העדפת תזכורת (עברי / לועזי)
-5️⃣ - שינוי פנייה (זכר / נקבה)
-6️⃣ - עדכון קרבה במשפחה
-7️⃣ - עדכון איחול / ברכה אישית
+2️⃣ - עדכון תאריך לועזי (יום וחודש)
+3️⃣ - עדכון תאריך עברי (יום וחודש)
+4️⃣ - שינוי פנייה (זכר / נקבה)
+5️⃣ - עדכון קרבה במשפחה
+6️⃣ - עדכון איחול / ברכה אישית
 
 *(ניתן לשלוח "סיום" בכל שלב)*`;
 
@@ -366,7 +349,7 @@ https://family-birthday-bot-obx1.onrender.com
 
 ────────────────────────
 רוצים לעדכן שדה נוסף?
-השיבו במספר (1-7), או השיבו *סיום* לסיום השיחה. 😊`;
+השיבו במספר (1-6), או השיבו *סיום* לסיום השיחה. 😊`;
 
     await this.sock.sendMessage(fromJid, { text: msg });
   }
@@ -480,19 +463,10 @@ https://family-birthday-bot-obx1.onrender.com
     const relationStr = person.relation ? ` (${person.relation})` : '';
     const celebrantName = `${person.name}${relationStr}`;
 
-    let ageText = '';
-    if (person.year) {
-      const thisYear = new Date().getFullYear();
-      const age = thisYear - person.year;
-      if (age > 0) {
-        ageText = isFemale ? `בת ${age}` : `בן ${age}`;
-      }
-    }
-
     const defaultTemplate = 
 `🎉 *יום הולדת שמח!* 🎉
 
-המון מזל טוב *ל${person.name}* ${isFemale ? 'היקרה שחוגגת' : 'היקר שחוגג'} היום יום הולדת${ageText ? ' ' + ageText : ''}! 🎂🎈
+המון מזל טוב *ל${person.name}* ${isFemale ? 'היקרה שחוגגת' : 'היקר שחוגג'} היום יום הולדת! 🎂🎈
 
 💬 *ברכה:*
 "{wishText}"
@@ -502,7 +476,7 @@ https://family-birthday-bot-obx1.onrender.com
     let msg = template && template.trim() ? template : defaultTemplate;
 
     msg = msg.replace(/\{name\}/g, celebrantName);
-    msg = msg.replace(/\{ageText\}/g, ageText);
+    msg = msg.replace(/\{ageText\}/g, '');
     msg = msg.replace(/\{wishText\}/g, person.customWish || 'מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨');
 
     return msg;

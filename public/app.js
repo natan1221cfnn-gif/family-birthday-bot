@@ -235,19 +235,11 @@ window.switchCalendarType = function(type) {
     tabGreg.classList.remove('active');
     hebWrap.style.display = 'grid';
     gregWrap.style.display = 'none';
-    
-    // Switch reminder radio to Hebrew by default
-    const hebRadio = document.querySelector('input[name="reminderType"][value="hebrew"]');
-    if (hebRadio) hebRadio.checked = true;
   } else {
     tabGreg.classList.add('active');
     tabHeb.classList.remove('active');
     gregWrap.style.display = 'grid';
     hebWrap.style.display = 'none';
-
-    // Switch reminder radio to Gregorian by default
-    const gregRadio = document.querySelector('input[name="reminderType"][value="gregorian"]');
-    if (gregRadio) gregRadio.checked = true;
   }
 };
 
@@ -378,19 +370,11 @@ async function handleFormSubmit(e) {
       showFeedback('אנא בחרו יום וחודש לועזי', 'error');
       return;
     }
-    if (!yearVal) {
-      showFeedback('שנת לידה הינה שדה חובה', 'error');
-      return;
-    }
   }
 
   if (currentCalendarType === 'hebrew') {
     if (!hebrewDayVal || !hebrewMonthVal) {
       showFeedback('אנא בחרו יום וחודש עברי', 'error');
-      return;
-    }
-    if (!hebrewYearVal) {
-      showFeedback('שנת לידה עברית הינה שדה חובה (למשל: תשפ"ג או 2023)', 'error');
       return;
     }
   }
@@ -407,13 +391,11 @@ async function handleFormSubmit(e) {
       name,
       dateType: currentCalendarType,
       gender,
-      reminderType,
+      reminderType: currentCalendarType,
       day: dayVal ? parseInt(dayVal, 10) : null,
       month: monthVal ? parseInt(monthVal, 10) : null,
-      year: yearVal ? parseInt(yearVal, 10) : null,
       hebrewDay: hebrewDayVal ? parseInt(hebrewDayVal, 10) : null,
       hebrewMonth: hebrewMonthVal || null,
-      hebrewYear: hebrewYearVal || null,
       relation,
       customWish
     };
@@ -458,7 +440,7 @@ function showFeedback(msg, type) {
   }, 5000);
 }
 
-// Calculate Days until next birthday & Age
+// Calculate Days until next birthday
 function getBirthdayCalculations(item) {
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -506,30 +488,9 @@ function getBirthdayCalculations(item) {
     diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
   }
 
-  let age = null;
-  if (item.year) {
-    age = targetYear - item.year;
-  } else if (item.hebrewYear) {
-    const todayHeb = convertGregorianToHebrew(currentDay, currentMonth, currentYear);
-    age = todayHeb.hebrewYear - item.hebrewYear;
-  }
-
-  let genderAgeLabel = '';
-  if (age && age > 0) {
-    if (item.gender === 'female') {
-      genderAgeLabel = isToday ? `בת ${age}` : `תהיה בת ${age}`;
-    } else if (item.gender === 'male') {
-      genderAgeLabel = isToday ? `בן ${age}` : `יהיה בן ${age}`;
-    } else {
-      genderAgeLabel = isToday ? `גיל ${age}` : `יהיה גיל ${age}`;
-    }
-  }
-
   return {
     isToday,
     daysUntil: isToday ? 0 : diffDays,
-    nextAge: age,
-    genderAgeLabel,
     formattedDate: `${item.day} ב${HEBREW_MONTHS[item.month - 1]}`
   };
 }
@@ -556,9 +517,7 @@ function updateHighlightCard() {
     highlightLabel.textContent = 'חוגגים היום! 🎂';
     highlightName.textContent = nearest.name;
     const verb = nearest.gender === 'female' ? 'חוגגת' : (nearest.gender === 'male' ? 'חוגג' : 'חוגג/ת');
-    highlightDesc.textContent = nearest.calc.genderAgeLabel 
-      ? `${verb} היום יום הולדת (${nearest.calc.genderAgeLabel})! שיהיה המון מזל טוב! 🎉`
-      : `${verb} היום יום הולדת! שיהיה המון מזל טוב! 🎉`;
+    highlightDesc.textContent = `${verb} היום יום הולדת! שיהיה המון מזל טוב! 🎉`;
     highlightDays.textContent = 'היום!';
     highlightDaysText.textContent = '🎈';
     highlightBadge.className = 'highlight-badge today';
@@ -566,9 +525,8 @@ function updateHighlightCard() {
     highlightLabel.textContent = 'יום ההולדת הבא 🎈';
     highlightName.textContent = nearest.name;
     
-    let ageStr = nearest.calc.genderAgeLabel ? `(${nearest.calc.genderAgeLabel})` : '';
-    let hebrewDateExtra = nearest.hebrewDateStr ? ` • ${nearest.hebrewDateStr}` : '';
-    highlightDesc.textContent = `ב-${nearest.calc.formattedDate}${hebrewDateExtra} ${ageStr}`;
+    let hebrewDateExtra = nearest.hebrewDateStr ? ` • 📜 ${nearest.hebrewDateStr}` : '';
+    highlightDesc.textContent = `ב-📅 ${nearest.calc.formattedDate}${hebrewDateExtra}`;
     
     highlightDays.textContent = nearest.calc.daysUntil;
     highlightDaysText.textContent = nearest.calc.daysUntil === 1 ? 'מחר!' : 'ימים';
@@ -611,7 +569,6 @@ function renderBirthdays() {
   birthdaysList.innerHTML = filtered.map(item => {
     const calc = getBirthdayCalculations(item);
     const firstLetter = item.name.charAt(0);
-    const genderIcon = item.gender === 'female' ? '👧' : (item.gender === 'male' ? '👦' : '👤');
 
     return `
       <div class="birthday-item ${calc.isToday ? 'is-today' : ''}">
@@ -623,7 +580,7 @@ function renderBirthdays() {
               ${item.relation ? `<span class="item-relation">${escapeHtml(item.relation)}</span>` : ''}
             </div>
             <div class="item-date">
-              <span>📅 ${calc.formattedDate} ${item.year ? `(${item.year})` : ''}</span>
+              <span>📅 ${calc.formattedDate}</span>
               ${item.hebrewDateStr ? `<span class="card-hebrew-date">• 📜 ${escapeHtml(item.hebrewDateStr)}</span>` : ''}
             </div>
             <div class="item-wish">${item.customWish ? `"${escapeHtml(item.customWish)}"` : '✨ "מאחלים שפע של בריאות, שמחה והגשמת חלומות!"'}</div>
@@ -642,7 +599,6 @@ function renderBirthdays() {
           <span class="countdown-pill">
             ${calc.isToday ? '🎉 היום!' : (calc.daysUntil === 1 ? 'מחר!' : `עוד ${calc.daysUntil} ימים`)}
           </span>
-          ${calc.genderAgeLabel ? `<span class="age-text">${calc.genderAgeLabel}</span>` : ''}
         </div>
       </div>
     `;
