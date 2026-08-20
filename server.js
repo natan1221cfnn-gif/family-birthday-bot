@@ -350,8 +350,8 @@ app.post('/api/admin/send-test', checkAuth, async (req, res) => {
   try {
     const config = getConfig();
     const testEntry = {
-      name: "דני (הודעת בדיקה)",
-      year: 2000,
+      name: "דני בדיקה",
+      gender: "male",
       customWish: "זוהי הודעת בדיקה למערכת ימי ההולדת! 🚀"
     };
 
