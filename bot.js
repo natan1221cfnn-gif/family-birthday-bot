@@ -460,24 +460,41 @@ https://family-birthday-bot-obx1.onrender.com
 
   formatGreetingMessage(template, person) {
     const isFemale = person.gender === 'female';
-    const relationStr = person.relation ? ` (${person.relation})` : '';
-    const celebrantName = `${person.name}${relationStr}`;
+    const honorific = isFemale ? 'היקרה שחוגגת היום' : 'היקר שחוגג היום';
+    const cleanName = person.name.trim();
 
     const defaultTemplate = 
 `🎉 *יום הולדת שמח!* 🎉
 
-המון מזל טוב *ל${person.name}* ${isFemale ? 'היקרה שחוגגת' : 'היקר שחוגג'} היום יום הולדת! 🎂🎈
+המון מזל טוב *ל{name}* ${honorific} יום הולדת! 🎂🎈
 
 💬 *ברכה:*
 "{wishText}"
 
 אוהבים ומאחלים מכל הלב, המשפחה! 💐🥰`;
 
-    let msg = template && template.trim() ? template : defaultTemplate;
+    let msg = (template && template.trim()) ? template : defaultTemplate;
 
-    msg = msg.replace(/\{name\}/g, celebrantName);
+    // Replace {greetingHonor} or generic slash honorifics
+    msg = msg.replace(/\{greetingHonor\}/g, honorific);
+    msg = msg.replace(/היקר\/ה שחוגג\/ת היום/g, honorific);
+    msg = msg.replace(/היקר\/ה שחוגג\/ת/g, isFemale ? 'היקרה שחוגגת' : 'היקר שחוגג');
+    msg = msg.replace(/היקר\/ה/g, isFemale ? 'היקרה' : 'היקר');
+    msg = msg.replace(/שחוגג\/ת/g, isFemale ? 'שחוגגת' : 'שחוגג');
+
+    // Fix broken asterisk prefix patterns in WhatsApp (e.g. ל-*{name}* -> *ל{name}*)
+    msg = msg.replace(/ל-\*\{name\}\*/g, `*ל${cleanName}*`);
+    msg = msg.replace(/ל\s*\*\{name\}\*/g, `*ל${cleanName}*`);
+    msg = msg.replace(/\*ל\{name\}\*/g, `*ל${cleanName}*`);
+    msg = msg.replace(/\{name\}/g, cleanName);
+
     msg = msg.replace(/\{ageText\}/g, '');
-    msg = msg.replace(/\{wishText\}/g, person.customWish || 'מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨');
+
+    const wish = (person.customWish && person.customWish.trim()) 
+      ? person.customWish.trim() 
+      : 'מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨';
+
+    msg = msg.replace(/\{wishText\}/g, wish);
 
     return msg;
   }

@@ -117,7 +117,8 @@ function getConfig() {
         groupName: "משפחה",
         notificationHour: 8,
         notificationMinute: 30,
-        messageTemplate: "🎉 *יום הולדת שמח!* 🎉\n\nהמון מזל טוב *ל{name}* {greetingHonor} יום הולדת{ageText}! 🎂🎈\n\n{wishText}\n\nאוהבים ומאחלים מכל הלב,\nהמשפחה! 💐🥰",
+        defaultWish: "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨",
+        messageTemplate: "🎉 *יום הולדת שמח!* 🎉\n\nהמון מזל טוב *ל{name}* {greetingHonor} יום הולדת! 🎂🎈\n\n💬 *ברכה:*\n\"{wishText}\"\n\nאוהבים ומאחלים מכל הלב, המשפחה! 💐🥰",
         adminPin: "natan1221"
       };
     }
