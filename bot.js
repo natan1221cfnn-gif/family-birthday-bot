@@ -206,7 +206,20 @@ class WhatsAppBot {
     let ageText = '';
     if (birthdayPerson.year) {
       const age = currentYear - birthdayPerson.year;
-      ageText = ` ${age}`;
+      if (birthdayPerson.gender === 'female') {
+        ageText = ` בת ${age}`;
+      } else if (birthdayPerson.gender === 'male') {
+        ageText = ` בן ${age}`;
+      } else {
+        ageText = ` גיל ${age}`;
+      }
+    }
+
+    let greetingHonor = 'היקר/ה שחוגג/ת היום';
+    if (birthdayPerson.gender === 'female') {
+      greetingHonor = 'היקרה שחוגגת היום';
+    } else if (birthdayPerson.gender === 'male') {
+      greetingHonor = 'היקר שחוגג היום';
     }
 
     const defaultWish = config.defaultWish || "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨";
@@ -216,11 +229,17 @@ class WhatsAppBot {
 
     const wishText = `💬 *ברכה:* "${chosenWish}"`;
 
-    let text = config.messageTemplate || "🎉 *יום הולדת שמח!* 🎉\n\nהמון מזל טוב ל-*{name}*! 🎂🎈\n{wishText}";
-    text = text.replace(/{name}/g, birthdayPerson.name);
-    text = text.replace(/{ageText}/g, ageText);
-    text = text.replace(/{wishText}/g, wishText);
-    text = text.replace(/{customWish}/g, chosenWish);
+    let text = config.messageTemplate || "🎉 *יום הולדת שמח!* 🎉\n\nהמון מזל טוב *ל{name}* {greetingHonor} יום הולדת{ageText}! 🎂🎈\n\n{wishText}\n\nאוהבים ומאחלים מכל הלב,\nהמשפחה! 💐🥰";
+    
+    // Fix bold syntax so *לשם* renders in bold in WhatsApp
+    text = text.replace(/ל-\*{name}\*/g, `*ל${birthdayPerson.name}*`);
+    text = text.replace(/ל\*{name}\*/g, `*ל${birthdayPerson.name}*`);
+    text = text.replace(/\{name\}/g, birthdayPerson.name);
+    text = text.replace(/\{greetingHonor\}/g, greetingHonor);
+    text = text.replace(/היקר\/ה שחוגג\/ת/g, greetingHonor);
+    text = text.replace(/\{ageText\}/g, ageText);
+    text = text.replace(/\{wishText\}/g, wishText);
+    text = text.replace(/\{customWish\}/g, chosenWish);
 
     return await this.sendMessageToGroup(config.groupName, text);
   }

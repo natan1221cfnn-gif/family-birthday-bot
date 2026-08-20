@@ -3,6 +3,7 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const cron = require('node-cron');
+const { convertGregorianToHebrew, convertHebrewToGregorian } = require('./lib/hebrewCalendar');
 const bot = require('./bot');
 
 const app = express();
@@ -27,44 +28,54 @@ app.use('/api', (req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 const DEFAULT_FAMILY_BIRTHDAYS = [
-  { name: "ורד דידי", relation: "הבת של נאוה", day: 27, month: 6, year: 1990 },
-  { name: "יוסי דידי", relation: "בעלה של ורד (הבת של נאוה)", day: 2, month: 4, year: 1991 },
-  { name: "ציון טהרני", relation: "משפחה", day: 7, month: 7, year: 1992 },
-  { name: "פנינה טהרני", relation: "הבת של נאוה", day: 21, month: 3, year: 1993 },
-  { name: "דנה כהן", relation: "הבת של נופת", day: 10, month: 7, year: 1993 },
-  { name: "יאיר עג'מי", relation: "הבן של ניצה", day: 20, month: 5, year: 1998 },
-  { name: "אודיה עג'מי", relation: "אשתו של יאיר (הבן של ניצה)", day: 4, month: 9, year: 1999 },
-  { name: "תמר דידי", relation: "הבת של ורד (הבת של נאוה)", day: 29, month: 10, year: 2013 },
-  { name: "יאיר דידי", relation: "הבן של ורד (הבת של נאוה)", day: 28, month: 7, year: 2016 },
-  { name: "עדי דידי", relation: "הבת של ורד (הבת של נאוה)", day: 23, month: 4, year: 2019 },
-  { name: "נועה דידי", relation: "הבת של ורד (הבת של נאוה)", day: 17, month: 1, year: 2022 },
-  { name: "הללי עג'מי", relation: "הבת של יאיר (הבן של ניצה)", day: 28, month: 7, year: 2022 },
-  { name: "הראל דידי", relation: "הבן של ורד (הבת של נאוה)", day: 18, month: 6, year: 2025 },
-  { name: "הדס דידי", relation: "הבת של ורד (הבת של נאוה)", day: 18, month: 6, year: 2025 },
-  { name: "אליה עג'מי", relation: "הבן של יאיר (הבן של ניצה)", day: 15, month: 9, year: 2025 },
-  { name: "אריאל דוד יצחקוב", relation: "הבן של נופת", day: 7, month: 6, year: 2010 },
-  { name: "אלעזר אוריין", relation: "בעלה של יסכה (הבת של ניצה)", day: 17, month: 11, year: 2003 },
-  { name: "יסכה אוריין", relation: "הבת של ניצה", day: 21, month: 4, year: 2003 },
-  { name: "עמוס כהן", relation: "בעלה של דנה (הבת של נופת)", day: 30, month: 12, year: 1992 },
-  { name: "יעל כהן", relation: "הבת של דנה (הבת של נופת)", day: 19, month: 10, year: 2022 },
-  { name: "יסכה כהן", relation: "הבת של דנה (הבת של נופת)", day: 1, month: 2, year: 2025 },
-  { name: "נעם עג'מי", relation: "הבן של ניצה", day: 12, month: 6, year: 1995 },
-  { name: "אוריה עג'מי", relation: "אשתו של נעם", day: 3, month: 3, year: 1995 },
-  { name: "רני עג'מי", relation: "הבת של נעם ואוריה", day: 25, month: 6, year: 2026 },
-  { name: "זגדון יקירה", relation: "אשת אלישע", day: 24, month: 11 },
-  { name: "יערה זגדון", relation: "הבת של אלישע", day: 25, month: 1 },
-  { name: "אמיר זגדון", relation: "בן של אלישע", day: 16, month: 1 },
-  { name: "אלישע זגדון", relation: "בן של סבתא רחל וסבא כדיר", day: 1, month: 10 }
-].map((m, idx) => ({
-  id: `bday_${idx + 1}_${m.name.replace(/\s+/g, '_')}`,
-  name: m.name,
-  day: m.day,
-  month: m.month,
-  year: m.year || undefined,
-  relation: m.relation,
-  customWish: "",
-  createdAt: new Date().toISOString()
-}));
+  { name: "ורד דידי", relation: "הבת של נאוה", gender: "female", day: 27, month: 6, year: 1990, reminderType: "gregorian" },
+  { name: "יוסי דידי", relation: "בעלה של ורד (הבת של נאוה)", gender: "male", day: 2, month: 4, year: 1991, reminderType: "gregorian" },
+  { name: "ציון טהרני", relation: "משפחה", gender: "male", day: 7, month: 7, year: 1992, reminderType: "hebrew" },
+  { name: "פנינה טהרני", relation: "הבת של נאוה", gender: "female", day: 21, month: 3, year: 1993, reminderType: "gregorian" },
+  { name: "דנה כהן", relation: "הבת של נופת", gender: "female", day: 10, month: 7, year: 1993, reminderType: "hebrew" },
+  { name: "יאיר עג'מי", relation: "הבן של ניצה", gender: "male", day: 20, month: 5, year: 1998, reminderType: "hebrew" },
+  { name: "אודיה עג'מי", relation: "אשתו של יאיר (הבן של ניצה)", gender: "female", day: 4, month: 9, year: 1999, reminderType: "hebrew" },
+  { name: "תמר דידי", relation: "הבת של ורד (הבת של נאוה)", gender: "female", day: 29, month: 10, year: 2013, reminderType: "gregorian" },
+  { name: "יאיר דידי", relation: "הבן של ורד (הבת של נאוה)", gender: "male", day: 28, month: 7, year: 2016, reminderType: "gregorian" },
+  { name: "עדי דידי", relation: "הבת של ורד (הבת של נאוה)", gender: "female", day: 23, month: 4, year: 2019, reminderType: "gregorian" },
+  { name: "נועה דידי", relation: "הבת של ורד (הבת של נאוה)", gender: "female", day: 17, month: 1, year: 2022, reminderType: "gregorian" },
+  { name: "הללי עג'מי", relation: "הבת של יאיר (הבן של ניצה)", gender: "female", day: 28, month: 7, year: 2022, reminderType: "hebrew" },
+  { name: "הראל דידי", relation: "הבן של ורד (הבת של נאוה)", gender: "male", day: 18, month: 6, year: 2025, reminderType: "gregorian" },
+  { name: "הדס דידי", relation: "הבת של ורד (הבת של נאוה)", gender: "female", day: 18, month: 6, year: 2025, reminderType: "gregorian" },
+  { name: "אליה עג'מי", relation: "הבן של יאיר (הבן של ניצה)", gender: "male", day: 15, month: 9, year: 2025, reminderType: "hebrew" },
+  { name: "אריאל דוד יצחקוב", relation: "הבן של נופת", gender: "male", day: 7, month: 6, year: 2010, reminderType: "hebrew" },
+  { name: "אלעזר אוריין", relation: "בעלה של יסכה (הבת של ניצה)", gender: "male", day: 17, month: 11, year: 2003, reminderType: "hebrew" },
+  { name: "יסכה אוריין", relation: "הבת של ניצה", gender: "female", day: 21, month: 4, year: 2003, reminderType: "hebrew" },
+  { name: "עמוס כהן", relation: "בעלה של דנה (הבת של נופת)", gender: "male", day: 30, month: 12, year: 1992, reminderType: "hebrew" },
+  { name: "יעל כהן", relation: "הבת של דנה (הבת של נופת)", gender: "female", day: 19, month: 10, year: 2022, reminderType: "hebrew" },
+  { name: "יסכה כהן", relation: "הבת של דנה (הבת של נופת)", gender: "female", day: 1, month: 2, year: 2025, reminderType: "hebrew" },
+  { name: "נעם עג'מי", relation: "הבן של ניצה", gender: "male", day: 12, month: 6, year: 1995, reminderType: "hebrew" },
+  { name: "אוריה עג'מי", relation: "אשתו של נעם", gender: "female", day: 3, month: 3, year: 1995, reminderType: "hebrew" },
+  { name: "רני עג'מי", relation: "הבת של נעם ואוריה", gender: "female", day: 25, month: 6, year: 2026, reminderType: "hebrew" },
+  { name: "זגדון יקירה", relation: "אשת אלישע", gender: "female", day: 24, month: 11, reminderType: "hebrew" },
+  { name: "יערה זגדון", relation: "הבת של אלישע", gender: "female", day: 25, month: 1, reminderType: "hebrew" },
+  { name: "אמיר זגדון", relation: "בן של אלישע", gender: "male", day: 16, month: 1, reminderType: "hebrew" },
+  { name: "אלישע זגדון", relation: "בן של סבתא רחל וסבא כדיר", gender: "male", day: 1, month: 10, reminderType: "hebrew" }
+].map((m, idx) => {
+  const hebInfo = convertGregorianToHebrew(m.day, m.month, m.year);
+  return {
+    id: `bday_${idx + 1}_${m.name.replace(/\s+/g, '_')}`,
+    name: m.name,
+    gender: m.gender || 'unspecified',
+    day: m.day,
+    month: m.month,
+    year: m.year || undefined,
+    hebrewDay: hebInfo.hebrewDay,
+    hebrewMonth: hebInfo.hebrewMonth,
+    hebrewMonthName: hebInfo.hebrewMonthName,
+    hebrewDateStr: hebInfo.hebrewDateStr,
+    hebrewYear: hebInfo.hebrewYear,
+    reminderType: m.reminderType || 'gregorian',
+    relation: m.relation,
+    customWish: "",
+    createdAt: new Date().toISOString()
+  };
+});
 
 // Helpers to read/write JSON files safely
 function getBirthdays() {
@@ -100,8 +111,8 @@ function getConfig() {
         groupName: "משפחה",
         notificationHour: 8,
         notificationMinute: 30,
-        messageTemplate: "🎉 *יום הולדת שמח!* 🎉\n\nהמון מזל טוב ל-*{name}* היקר/ה שחוגג/ת היום יום הולדת{ageText}! 🎂🎈\nמאחלים לך שפע של בריאות, אושר, שמחה והצלחה בכל מעשי ידיך! 🥳💐{customWish}",
-        adminPin: "1234"
+        messageTemplate: "🎉 *יום הולדת שמח!* 🎉\n\nהמון מזל טוב *ל{name}* {greetingHonor} יום הולדת{ageText}! 🎂🎈\n\n{wishText}\n\nאוהבים ומאחלים מכל הלב,\nהמשפחה! 💐🥰",
+        adminPin: "natan1221"
       };
     }
     return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
@@ -135,10 +146,52 @@ app.get('/api/birthdays', (req, res) => {
 
 // Add a new birthday from the landing page
 app.post('/api/birthdays', (req, res) => {
-  const { name, day, month, year, relation, customWish } = req.body;
+  const { 
+    name, 
+    dateType, 
+    day, 
+    month, 
+    year, 
+    hebrewDay, 
+    hebrewMonth, 
+    hebrewYear, 
+    gender, 
+    reminderType, 
+    relation, 
+    customWish 
+  } = req.body;
 
-  if (!name || !day || !month) {
-    return res.status(400).json({ message: 'שם, יום וחודש הם שדות חובה' });
+  if (!name || !name.trim()) {
+    return res.status(400).json({ message: 'נא להזין שם' });
+  }
+
+  let finalDay = day ? parseInt(day, 10) : null;
+  let finalMonth = month ? parseInt(month, 10) : null;
+  let finalYear = year ? parseInt(year, 10) : null;
+
+  let finalHebDay = hebrewDay ? parseInt(hebrewDay, 10) : null;
+  let finalHebMonth = hebrewMonth || null;
+  let finalHebYear = hebrewYear ? parseInt(hebrewYear, 10) : null;
+  let finalHebDateStr = '';
+
+  // If user entered Hebrew date
+  if (dateType === 'hebrew' && finalHebDay && finalHebMonth) {
+    const gregInfo = convertHebrewToGregorian(finalHebDay, finalHebMonth, finalHebYear);
+    finalDay = gregInfo.day;
+    finalMonth = gregInfo.month;
+    finalYear = gregInfo.year || null;
+
+    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, finalYear);
+    finalHebDateStr = hebInfo.hebrewDateStr;
+  } else if (finalDay && finalMonth) {
+    // User entered Gregorian date -> calculate Hebrew
+    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, finalYear);
+    finalHebDay = hebInfo.hebrewDay;
+    finalHebMonth = hebInfo.hebrewMonth;
+    finalHebDateStr = hebInfo.hebrewDateStr;
+    finalHebYear = hebInfo.hebrewYear;
+  } else {
+    return res.status(400).json({ message: 'נא לבחור תאריך יום הולדת תקין' });
   }
 
   const list = getBirthdays();
@@ -148,9 +201,15 @@ app.post('/api/birthdays', (req, res) => {
   const newEntry = {
     id: 'bday_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
     name: name.trim(),
-    day: parseInt(day, 10),
-    month: parseInt(month, 10),
-    year: year ? parseInt(year, 10) : null,
+    gender: gender || 'unspecified',
+    day: finalDay,
+    month: finalMonth,
+    year: finalYear,
+    hebrewDay: finalHebDay,
+    hebrewMonth: finalHebMonth,
+    hebrewDateStr: finalHebDateStr,
+    hebrewYear: finalHebYear,
+    reminderType: reminderType || 'gregorian',
     relation: relation ? relation.trim() : '',
     customWish: (customWish && customWish.trim()) ? customWish.trim() : fallbackWish,
     createdAt: new Date().toISOString()
@@ -159,7 +218,7 @@ app.post('/api/birthdays', (req, res) => {
   list.push(newEntry);
   saveBirthdays(list);
 
-  console.log(`[API] 🎉 יום הולדת חדש נוסף: ${newEntry.name} (${newEntry.day}/${newEntry.month})`);
+  console.log(`[API] 🎉 יום הולדת חדש נוסף: ${newEntry.name} (${newEntry.day}/${newEntry.month} | ${newEntry.hebrewDateStr})`);
   res.status(201).json({ message: 'נוסף בהצלחה', entry: newEntry });
 });
 
@@ -332,13 +391,27 @@ async function checkAndSendTodayBirthdays() {
   const todayDay = now.getDate();
   const todayMonth = now.getMonth() + 1;
 
+  // Calculate Hebrew date for today in Israel
+  const todayHeb = convertGregorianToHebrew(todayDay, todayMonth, now.getFullYear());
+  const todayHebDay = todayHeb.hebrewDay;
+  const todayHebMonth = todayHeb.hebrewMonth;
+  const todayHebStr = todayHeb.hebrewDateStr;
+
+  console.log(`[Daily Check] תאריך לועזי היום: ${todayDay}/${todayMonth} | תאריך עברי היום: ${todayHebStr}`);
+
   const list = getBirthdays();
   const config = getConfig();
 
-  const todayCelebrants = list.filter(item => item.day === todayDay && item.month === todayMonth);
+  const todayCelebrants = list.filter(item => {
+    if (item.reminderType === 'hebrew') {
+      return item.hebrewDay === todayHebDay && item.hebrewMonth === todayHebMonth;
+    }
+    // Default: Gregorian
+    return item.day === todayDay && item.month === todayMonth;
+  });
 
   if (todayCelebrants.length === 0) {
-    console.log(`[Daily Check] אין היום (${todayDay}/${todayMonth}) ימי הולדת ברשימה.`);
+    console.log(`[Daily Check] אין היום ימי הולדת ברשימה.`);
     return;
   }
 

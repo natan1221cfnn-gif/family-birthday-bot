@@ -4,10 +4,18 @@ const HEBREW_MONTHS = [
   'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
 ];
 
+const HEBREW_NUMERALS = [
+  "א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ז'", "ח'", "ט'", "י'",
+  "י\"א", "י\"ב", "י\"ג", "י\"ד", "ט\"ו", "ט\"ז", "י\"ז", "י\"ח", "י\"ט", "כ'",
+  "כ\"א", "כ\"ב", "כ\"ג", "כ\"ד", "כ\"ה", "כ\"ו", "כ\"ז", "כ\"ח", "כ\"ט", "ל'"
+];
+
 let allBirthdays = [];
+let currentCalendarType = 'gregorian';
 
 // DOM Elements
 const birthDaySelect = document.getElementById('birthDay');
+const hebrewDaySelect = document.getElementById('hebrewDay');
 const birthdayForm = document.getElementById('birthdayForm');
 const submitBtn = document.getElementById('submitBtn');
 const formFeedback = document.getElementById('formFeedback');
@@ -27,11 +35,12 @@ const highlightLabel = document.getElementById('highlightLabel');
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   populateDayOptions();
+  populateHebrewDayOptions();
   loadBirthdays();
   setupEventListeners();
 });
 
-// Populate Day Options (1 to 31)
+// Populate Gregorian Day Options (1 to 31)
 function populateDayOptions() {
   for (let i = 1; i <= 31; i++) {
     const opt = document.createElement('option');
@@ -40,6 +49,46 @@ function populateDayOptions() {
     birthDaySelect.appendChild(opt);
   }
 }
+
+// Populate Hebrew Day Options (א' to ל')
+function populateHebrewDayOptions() {
+  if (!hebrewDaySelect) return;
+  HEBREW_NUMERALS.forEach((numeral, idx) => {
+    const opt = document.createElement('option');
+    opt.value = idx + 1;
+    opt.textContent = `${numeral} (${idx + 1})`;
+    hebrewDaySelect.appendChild(opt);
+  });
+}
+
+// Switch between Gregorian & Hebrew Calendar Tabs
+window.switchCalendarType = function(type) {
+  currentCalendarType = type;
+  const tabGreg = document.getElementById('tabGregorian');
+  const tabHeb = document.getElementById('tabHebrew');
+  const gregWrap = document.getElementById('gregorianDateWrap');
+  const hebWrap = document.getElementById('hebrewDateWrap');
+
+  if (type === 'hebrew') {
+    tabHeb.classList.add('active');
+    tabGreg.classList.remove('active');
+    hebWrap.style.display = 'grid';
+    gregWrap.style.display = 'none';
+    
+    // Switch reminder radio to Hebrew by default
+    const hebRadio = document.querySelector('input[name="reminderType"][value="hebrew"]');
+    if (hebRadio) hebRadio.checked = true;
+  } else {
+    tabGreg.classList.add('active');
+    tabHeb.classList.remove('active');
+    gregWrap.style.display = 'grid';
+    hebWrap.style.display = 'none';
+
+    // Switch reminder radio to Gregorian by default
+    const gregRadio = document.querySelector('input[name="reminderType"][value="gregorian"]');
+    if (gregRadio) gregRadio.checked = true;
+  }
+};
 
 // Setup Event Listeners
 function setupEventListeners() {
@@ -141,15 +190,35 @@ async function handleFormSubmit(e) {
   e.preventDefault();
   
   const name = document.getElementById('personName').value.trim();
-  const day = parseInt(document.getElementById('birthDay').value, 10);
-  const month = parseInt(document.getElementById('birthMonth').value, 10);
+  const genderRadio = document.querySelector('input[name="gender"]:checked');
+  const gender = genderRadio ? genderRadio.value : 'unspecified';
+
+  const reminderRadio = document.querySelector('input[name="reminderType"]:checked');
+  const reminderType = reminderRadio ? reminderRadio.value : 'gregorian';
+
+  const dayVal = document.getElementById('birthDay').value;
+  const monthVal = document.getElementById('birthMonth').value;
   const yearVal = document.getElementById('birthYear').value.trim();
-  const year = yearVal ? parseInt(yearVal, 10) : null;
+
+  const hebrewDayVal = document.getElementById('hebrewDay').value;
+  const hebrewMonthVal = document.getElementById('hebrewMonth').value;
+  const hebrewYearVal = document.getElementById('hebrewYear').value.trim();
+
   const relation = document.getElementById('personRelation').value.trim();
   const customWish = document.getElementById('customWish').value.trim();
 
-  if (!name || isNaN(day) || isNaN(month)) {
-    showFeedback('אנא מלאו את כל שדות החובה', 'error');
+  if (!name) {
+    showFeedback('אנא הזינו שם מלא', 'error');
+    return;
+  }
+
+  if (currentCalendarType === 'gregorian' && (!dayVal || !monthVal)) {
+    showFeedback('אנא בחרו יום וחודש לועזי', 'error');
+    return;
+  }
+
+  if (currentCalendarType === 'hebrew' && (!hebrewDayVal || !hebrewMonthVal)) {
+    showFeedback('אנא בחרו יום וחודש עברי', 'error');
     return;
   }
 
@@ -161,10 +230,25 @@ async function handleFormSubmit(e) {
   submitBtn.disabled = true;
 
   try {
+    const payload = {
+      name,
+      dateType: currentCalendarType,
+      gender,
+      reminderType,
+      day: dayVal ? parseInt(dayVal, 10) : null,
+      month: monthVal ? parseInt(monthVal, 10) : null,
+      year: yearVal ? parseInt(yearVal, 10) : null,
+      hebrewDay: hebrewDayVal ? parseInt(hebrewDayVal, 10) : null,
+      hebrewMonth: hebrewMonthVal || null,
+      hebrewYear: hebrewYearVal || null,
+      relation,
+      customWish
+    };
+
     const res = await fetch('/api/birthdays', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, day, month, year, relation, customWish })
+      body: JSON.stringify(payload)
     });
 
     const data = await res.json();
@@ -195,6 +279,7 @@ async function handleFormSubmit(e) {
 function showFeedback(msg, type) {
   formFeedback.textContent = msg;
   formFeedback.className = `form-feedback ${type}`;
+  formFeedback.style.display = 'block';
   setTimeout(() => {
     formFeedback.style.display = 'none';
   }, 5000);
@@ -227,10 +312,22 @@ function getBirthdayCalculations(item) {
     age = targetYear - item.year;
   }
 
+  let genderAgeLabel = '';
+  if (age) {
+    if (item.gender === 'female') {
+      genderAgeLabel = isToday ? `בת ${age}` : `תהיה בת ${age}`;
+    } else if (item.gender === 'male') {
+      genderAgeLabel = isToday ? `בן ${age}` : `יהיה בן ${age}`;
+    } else {
+      genderAgeLabel = isToday ? `גיל ${age}` : `יהיה גיל ${age}`;
+    }
+  }
+
   return {
     isToday,
     daysUntil: isToday ? 0 : diffDays,
     nextAge: age,
+    genderAgeLabel,
     formattedDate: `${item.day} ב${HEBREW_MONTHS[item.month - 1]}`
   };
 }
@@ -256,9 +353,10 @@ function updateHighlightCard() {
   if (nearest.calc.isToday) {
     highlightLabel.textContent = 'חוגגים היום! 🎂';
     highlightName.textContent = nearest.name;
-    highlightDesc.textContent = nearest.calc.nextAge 
-      ? `חוגג/ת היום יום הולדת ${nearest.calc.nextAge}! שיהיה המון מזל טוב! 🎉`
-      : `חוגג/ת היום יום הולדת! שיהיה המון מזל טוב! 🎉`;
+    const verb = nearest.gender === 'female' ? 'חוגגת' : (nearest.gender === 'male' ? 'חוגג' : 'חוגג/ת');
+    highlightDesc.textContent = nearest.calc.genderAgeLabel 
+      ? `${verb} היום יום הולדת (${nearest.calc.genderAgeLabel})! שיהיה המון מזל טוב! 🎉`
+      : `${verb} היום יום הולדת! שיהיה המון מזל טוב! 🎉`;
     highlightDays.textContent = 'היום!';
     highlightDaysText.textContent = '🎈';
     highlightBadge.className = 'highlight-badge today';
@@ -266,8 +364,9 @@ function updateHighlightCard() {
     highlightLabel.textContent = 'יום ההולדת הבא 🎈';
     highlightName.textContent = nearest.name;
     
-    let ageStr = nearest.calc.nextAge ? `(יהיה בן/בת ${nearest.calc.nextAge})` : '';
-    highlightDesc.textContent = `ב-${nearest.calc.formattedDate} ${ageStr}`;
+    let ageStr = nearest.calc.genderAgeLabel ? `(${nearest.calc.genderAgeLabel})` : '';
+    let hebrewDateExtra = nearest.hebrewDateStr ? ` • ${nearest.hebrewDateStr}` : '';
+    highlightDesc.textContent = `ב-${nearest.calc.formattedDate}${hebrewDateExtra} ${ageStr}`;
     
     highlightDays.textContent = nearest.calc.daysUntil;
     highlightDaysText.textContent = nearest.calc.daysUntil === 1 ? 'מחר!' : 'ימים';
@@ -282,7 +381,8 @@ function renderBirthdays() {
 
   let filtered = allBirthdays.filter(item => {
     const matchName = item.name.toLowerCase().includes(searchTerm) || 
-                      (item.relation && item.relation.toLowerCase().includes(searchTerm));
+                      (item.relation && item.relation.toLowerCase().includes(searchTerm)) ||
+                      (item.hebrewDateStr && item.hebrewDateStr.includes(searchTerm));
     const matchMonth = (selectedMonth === 'all' || item.month.toString() === selectedMonth);
     return matchName && matchMonth;
   });
@@ -309,6 +409,7 @@ function renderBirthdays() {
   birthdaysList.innerHTML = filtered.map(item => {
     const calc = getBirthdayCalculations(item);
     const firstLetter = item.name.charAt(0);
+    const genderIcon = item.gender === 'female' ? '👧' : (item.gender === 'male' ? '👦' : '👤');
 
     return `
       <div class="birthday-item ${calc.isToday ? 'is-today' : ''}">
@@ -319,8 +420,16 @@ function renderBirthdays() {
               <span class="item-name">${escapeHtml(item.name)}</span>
               ${item.relation ? `<span class="item-relation">${escapeHtml(item.relation)}</span>` : ''}
             </div>
-            <div class="item-date">📅 ${calc.formattedDate} ${item.year ? `(${item.year})` : ''}</div>
+            <div class="item-date">
+              <span>📅 ${calc.formattedDate} ${item.year ? `(${item.year})` : ''}</span>
+              ${item.hebrewDateStr ? `<span class="card-hebrew-date">• 📜 ${escapeHtml(item.hebrewDateStr)}</span>` : ''}
+            </div>
             <div class="item-wish">${item.customWish ? `"${escapeHtml(item.customWish)}"` : '✨ "מאחלים שפע של בריאות, שמחה והגשמת חלומות!"'}</div>
+            <div>
+              ${item.reminderType === 'hebrew' 
+                ? '<span class="card-reminder-tag hebrew-pref">📜 תזכורת לפי עברי</span>' 
+                : '<span class="card-reminder-tag">📅 תזכורת לפי לועזי</span>'}
+            </div>
           </div>
         </div>
 
@@ -328,7 +437,7 @@ function renderBirthdays() {
           <span class="countdown-pill">
             ${calc.isToday ? '🎉 היום!' : (calc.daysUntil === 1 ? 'מחר!' : `עוד ${calc.daysUntil} ימים`)}
           </span>
-          ${calc.nextAge ? `<span class="age-text">${calc.isToday ? 'גיל' : 'יהיה גיל'} ${calc.nextAge}</span>` : ''}
+          ${calc.genderAgeLabel ? `<span class="age-text">${calc.genderAgeLabel}</span>` : ''}
         </div>
       </div>
     `;
