@@ -136,6 +136,11 @@ function saveConfig(cfg) {
 // Public APIs
 // ----------------------------------------------------
 
+// Get version
+app.get('/api/version', (req, res) => {
+  res.json({ version: 'v3_clean_years' });
+});
+
 // Get public config (default wish, etc.)
 app.get('/api/public-config', (req, res) => {
   const config = getConfig();
