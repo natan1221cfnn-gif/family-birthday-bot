@@ -430,6 +430,28 @@ label {
   color: #E65100;
 }
 
+.card-wa-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #E8F5E9;
+  color: #1B5E20;
+  border: 1px solid #C8E6C9;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.card-wa-edit-btn:hover {
+  background: #25D366;
+  color: white;
+  border-color: #25D366;
+  transform: translateY(-1px);
+}
+
 input, select, textarea {
   width: 100%;
   font-family: var(--font-main);

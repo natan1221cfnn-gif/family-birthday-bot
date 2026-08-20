@@ -212,14 +212,26 @@ async function handleFormSubmit(e) {
     return;
   }
 
-  if (currentCalendarType === 'gregorian' && (!dayVal || !monthVal)) {
-    showFeedback('אנא בחרו יום וחודש לועזי', 'error');
-    return;
+  if (currentCalendarType === 'gregorian') {
+    if (!dayVal || !monthVal) {
+      showFeedback('אנא בחרו יום וחודש לועזי', 'error');
+      return;
+    }
+    if (!yearVal) {
+      showFeedback('שנת לידה הינה שדה חובה', 'error');
+      return;
+    }
   }
 
-  if (currentCalendarType === 'hebrew' && (!hebrewDayVal || !hebrewMonthVal)) {
-    showFeedback('אנא בחרו יום וחודש עברי', 'error');
-    return;
+  if (currentCalendarType === 'hebrew') {
+    if (!hebrewDayVal || !hebrewMonthVal) {
+      showFeedback('אנא בחרו יום וחודש עברי', 'error');
+      return;
+    }
+    if (!hebrewYearVal) {
+      showFeedback('שנת לידה עברית הינה שדה חובה (למשל: תשפ"ג או 2023)', 'error');
+      return;
+    }
   }
 
   // Set loading state
@@ -425,10 +437,13 @@ function renderBirthdays() {
               ${item.hebrewDateStr ? `<span class="card-hebrew-date">• 📜 ${escapeHtml(item.hebrewDateStr)}</span>` : ''}
             </div>
             <div class="item-wish">${item.customWish ? `"${escapeHtml(item.customWish)}"` : '✨ "מאחלים שפע של בריאות, שמחה והגשמת חלומות!"'}</div>
-            <div>
+            <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
               ${item.reminderType === 'hebrew' 
                 ? '<span class="card-reminder-tag hebrew-pref">📜 תזכורת לפי עברי</span>' 
                 : '<span class="card-reminder-tag">📅 תזכורת לפי לועזי</span>'}
+              <a href="https://wa.me/972503913171?text=${encodeURIComponent(`היי, אני רוצה לעדכן את כרטיסיית יום ההולדת של ${item.name}`)}" target="_blank" class="card-wa-edit-btn" title="עדכן פרטים בוואטסאפ">
+                💬 עדכן בוואטסאפ
+              </a>
             </div>
           </div>
         </div>

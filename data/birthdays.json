@@ -420,7 +420,8 @@
     "reminderType": "hebrew",
     "relation": "אשת אלישע",
     "customWish": "",
-    "createdAt": "2026-08-20T13:14:17.315Z"
+    "createdAt": "2026-08-20T13:14:17.315Z",
+    "hebrewYear": null
   },
   {
     "id": "bday_26_יערה_זגדון",
@@ -435,7 +436,8 @@
     "reminderType": "hebrew",
     "relation": "הבת של אלישע",
     "customWish": "",
-    "createdAt": "2026-08-20T13:14:17.315Z"
+    "createdAt": "2026-08-20T13:14:17.315Z",
+    "hebrewYear": null
   },
   {
     "id": "bday_27_אמיר_זגדון",
@@ -450,7 +452,8 @@
     "reminderType": "hebrew",
     "relation": "בן של אלישע",
     "customWish": "",
-    "createdAt": "2026-08-20T13:14:17.315Z"
+    "createdAt": "2026-08-20T13:14:17.315Z",
+    "hebrewYear": null
   },
   {
     "id": "bday_28_אלישע_זגדון",
@@ -465,6 +468,55 @@
     "reminderType": "hebrew",
     "relation": "בן של סבתא רחל וסבא כדיר",
     "customWish": "",
-    "createdAt": "2026-08-20T13:14:17.315Z"
+    "createdAt": "2026-08-20T13:14:17.315Z",
+    "hebrewYear": null
+  },
+  {
+    "id": "bday_1787240921102_he0p7",
+    "name": "שני בידה",
+    "gender": "female",
+    "day": 1,
+    "month": 10,
+    "year": 2023,
+    "hebrewDay": 17,
+    "hebrewMonth": "תשרי",
+    "hebrewDateStr": "י\"ז בתשרי תשפ\"ד",
+    "hebrewYear": 5784,
+    "reminderType": "hebrew",
+    "relation": "הבת של בתאל לבית יצחקוב",
+    "customWish": "עד 120 בבריאות, אושר והמון חיוכים! 🎈",
+    "createdAt": "2026-08-20T15:48:41.102Z"
+  },
+  {
+    "id": "bday_1787241601658_11ywf",
+    "name": "יונתן בידה",
+    "gender": "male",
+    "day": 2,
+    "month": 12,
+    "year": 2022,
+    "hebrewDay": 8,
+    "hebrewMonth": "כסלו",
+    "hebrewDateStr": "ח' בכסלו תשפ\"ג",
+    "hebrewYear": 5783,
+    "reminderType": "hebrew",
+    "relation": "הבן של בתאל לבית יצחקוב",
+    "customWish": "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨",
+    "createdAt": "2026-08-20T16:00:01.658Z"
+  },
+  {
+    "id": "bday_1787246866947_x8crg",
+    "name": "נועם יצחקוב",
+    "gender": "male",
+    "day": 13,
+    "month": 10,
+    "year": null,
+    "hebrewDay": 10,
+    "hebrewMonth": "תשרי",
+    "hebrewDateStr": "י' בתשרי",
+    "hebrewYear": null,
+    "reminderType": "hebrew",
+    "relation": "נכד",
+    "customWish": "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨",
+    "createdAt": "2026-08-20T17:27:46.947Z"
   }
 ]

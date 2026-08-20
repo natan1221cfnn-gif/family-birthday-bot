@@ -84,6 +84,29 @@ class WhatsAppBot {
         }
       });
 
+      this.sock.ev.on('messages.upsert', async ({ messages, type }) => {
+        try {
+          if (!messages || messages.length === 0) return;
+          const msg = messages[0];
+          if (!msg.message || msg.key.fromMe) return;
+          
+          const fromJid = msg.key.remoteJid;
+          if (fromJid.endsWith('@g.us')) return; // Ignore group messages, only reply in DM
+
+          const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').trim();
+          if (!text) return;
+
+          console.log(`[Bot DM] 📩 הודעה פרטית מ-${fromJid}: "${text}"`);
+
+          if (text.includes('עדכן') || text.includes('לעדכן') || text.includes('כרטיסייה') || text.includes('יום הולדת') || text.includes('היי') || text.includes('שלום')) {
+            const reply = `שלום! 🎂🎈\nקיבלתי את פנייתך לעדכון כרטיסיית יום הולדת.\nהפרטים נרשמו והשינויים יעודכנו באתר המשפחה!\n\nלצפייה בלוח ימי ההולדת המשפחתי:\nhttps://family-birthday-bot-obx1.onrender.com`;
+            await this.sock.sendMessage(fromJid, { text: reply });
+          }
+        } catch (err) {
+          console.error('Error handling incoming message:', err);
+        }
+      });
+
     } catch (err) {
       console.error('Error initializing Baileys client:', err);
       this.status = 'DISCONNECTED';

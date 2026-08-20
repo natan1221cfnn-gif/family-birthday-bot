@@ -3,7 +3,12 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 const cron = require('node-cron');
-const { convertGregorianToHebrew, convertHebrewToGregorian } = require('./lib/hebrewCalendar');
+const { 
+  convertGregorianToHebrew, 
+  convertHebrewToGregorian, 
+  normalizeHebrewMonth, 
+  parseHebrewYear 
+} = require('./lib/hebrewCalendar');
 const bot = require('./bot');
 
 const app = express();
