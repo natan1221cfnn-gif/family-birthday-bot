@@ -242,6 +242,22 @@ app.post('/api/admin/request-pairing-code', checkAuth, async (req, res) => {
   }
 });
 
+// Bulk set / seed birthdays
+app.post('/api/admin/set-birthdays', checkAuth, (req, res) => {
+  const { birthdays } = req.body;
+  if (!Array.isArray(birthdays)) {
+    return res.status(400).json({ message: 'רשימת ימי הולדת לא תקינה' });
+  }
+  saveBirthdays(birthdays);
+  res.json({ message: `נשמרו בהצלחה ${birthdays.length} ימי הולדת בשרת! 🎉`, count: birthdays.length });
+});
+
+// Force re-seed default family members
+app.post('/api/admin/reseed', checkAuth, (req, res) => {
+  saveBirthdays(DEFAULT_FAMILY_BIRTHDAYS);
+  res.json({ message: `נטענו בהצלחה ${DEFAULT_FAMILY_BIRTHDAYS.length} בני המשפחה מהטבלה! ✅`, count: DEFAULT_FAMILY_BIRTHDAYS.length });
+});
+
 // Logout and Wipe WhatsApp Session completely
 app.post('/api/admin/bot-logout', checkAuth, async (req, res) => {
   try {
