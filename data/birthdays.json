@@ -1,1 +1,278 @@
-[]
+[
+  {
+    "id": "bday_import_1787229077312_0_aqe5",
+    "name": "ורד דידי",
+    "day": 27,
+    "month": 6,
+    "year": 1990,
+    "relation": "הבת של נאוה",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.313Z"
+  },
+  {
+    "id": "bday_import_1787229077320_1_qvkt",
+    "name": "יוסי דידי",
+    "day": 2,
+    "month": 4,
+    "year": 1991,
+    "relation": "בעלה של ורד (הבת של נאוה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.320Z"
+  },
+  {
+    "id": "bday_import_1787229077320_2_g977",
+    "name": "ציון טהרני",
+    "day": 7,
+    "month": 7,
+    "year": 1992,
+    "relation": "משפחה",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.320Z"
+  },
+  {
+    "id": "bday_import_1787229077320_3_8lqj",
+    "name": "פנינה טהרני",
+    "day": 21,
+    "month": 3,
+    "year": 1993,
+    "relation": "הבת של נאוה",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.320Z"
+  },
+  {
+    "id": "bday_import_1787229077320_4_a6gu",
+    "name": "דנה כהן",
+    "day": 10,
+    "month": 7,
+    "year": 1993,
+    "relation": "הבת של נופת",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.320Z"
+  },
+  {
+    "id": "bday_import_1787229077320_5_uefb",
+    "name": "יאיר עג'מי",
+    "day": 20,
+    "month": 5,
+    "year": 1998,
+    "relation": "הבן של ניצה",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.320Z"
+  },
+  {
+    "id": "bday_import_1787229077320_6_j04o",
+    "name": "אודיה עג'מי",
+    "day": 4,
+    "month": 9,
+    "year": 1999,
+    "relation": "אשתו של יאיר (הבן של ניצה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.320Z"
+  },
+  {
+    "id": "bday_import_1787229077320_7_iosx",
+    "name": "תמר דידי",
+    "day": 29,
+    "month": 10,
+    "year": 2013,
+    "relation": "הבת של ורד (הבת של נאוה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.320Z"
+  },
+  {
+    "id": "bday_import_1787229077320_8_iydm",
+    "name": "יאיר דידי",
+    "day": 28,
+    "month": 7,
+    "year": 2016,
+    "relation": "הבן של ורד (הבת של נאוה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.320Z"
+  },
+  {
+    "id": "bday_import_1787229077320_9_ndb3",
+    "name": "עדי דידי",
+    "day": 23,
+    "month": 4,
+    "year": 2019,
+    "relation": "הבת של ורד (הבת של נאוה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.320Z"
+  },
+  {
+    "id": "bday_import_1787229077320_10_l6dq",
+    "name": "נועה דידי",
+    "day": 17,
+    "month": 1,
+    "year": 2022,
+    "relation": "הבת של ורד (הבת של נאוה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_11_sa48",
+    "name": "הללי עג'מי",
+    "day": 28,
+    "month": 7,
+    "year": 2022,
+    "relation": "הבת של יאיר (הבן של ניצה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_12_5m3f",
+    "name": "הראל דידי",
+    "day": 18,
+    "month": 6,
+    "year": 2025,
+    "relation": "הבן של ורד (הבת של נאוה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_13_g4s8",
+    "name": "הדס דידי",
+    "day": 18,
+    "month": 6,
+    "year": 2025,
+    "relation": "הבת של ורד (הבת של נאוה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_14_w4kh",
+    "name": "אליה עג'מי",
+    "day": 15,
+    "month": 9,
+    "year": 2025,
+    "relation": "הבן של יאיר (הבן של ניצה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_15_2dgg",
+    "name": "אריאל דוד יצחקוב",
+    "day": 7,
+    "month": 6,
+    "year": 2010,
+    "relation": "הבן של נופת",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_16_md63",
+    "name": "אלעזר אוריין",
+    "day": 17,
+    "month": 11,
+    "year": 2003,
+    "relation": "בעלה של יסכה (הבת של ניצה)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_17_n5j4",
+    "name": "יסכה אוריין",
+    "day": 21,
+    "month": 4,
+    "year": 2003,
+    "relation": "הבת של ניצה",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_18_mi6w",
+    "name": "עמוס כהן",
+    "day": 30,
+    "month": 12,
+    "year": 1992,
+    "relation": "בעלה של דנה (הבת של נופת)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_19_690m",
+    "name": "יעל כהן",
+    "day": 19,
+    "month": 10,
+    "year": 2022,
+    "relation": "הבת של דנה (הבת של נופת)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_20_shj1",
+    "name": "יסכה כהן",
+    "day": 1,
+    "month": 2,
+    "year": 2025,
+    "relation": "הבת של דנה (הבת של נופת)",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_21_2e3v",
+    "name": "נעם עג'מי",
+    "day": 12,
+    "month": 6,
+    "year": 1995,
+    "relation": "הבן של ניצה",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_22_ra2f",
+    "name": "אוריה עג'מי",
+    "day": 3,
+    "month": 3,
+    "year": 1995,
+    "relation": "אשתו של נעם",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_23_p9ik",
+    "name": "רני עג'מי",
+    "day": 25,
+    "month": 6,
+    "year": 2026,
+    "relation": "הבת של נעם ואוריה",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_24_rm74",
+    "name": "זגדון יקירה",
+    "day": 24,
+    "month": 11,
+    "relation": "אשת אלישע",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_25_6k3i",
+    "name": "יערה זגדון",
+    "day": 25,
+    "month": 1,
+    "relation": "הבת של אלישע",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_26_2rwa",
+    "name": "אמיר זגדון",
+    "day": 16,
+    "month": 1,
+    "relation": "בן של אלישע",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  },
+  {
+    "id": "bday_import_1787229077321_27_avqs",
+    "name": "אלישע זגדון",
+    "day": 1,
+    "month": 10,
+    "relation": "בן של סבתא רחל וסבא כדיר",
+    "customWish": "",
+    "createdAt": "2026-08-20T12:31:17.321Z"
+  }
+]
