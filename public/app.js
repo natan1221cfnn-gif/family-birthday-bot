@@ -346,16 +346,11 @@ async function handleFormSubmit(e) {
   const genderRadio = document.querySelector('input[name="gender"]:checked');
   const gender = genderRadio ? genderRadio.value : 'unspecified';
 
-  const reminderRadio = document.querySelector('input[name="reminderType"]:checked');
-  const reminderType = reminderRadio ? reminderRadio.value : 'gregorian';
+  const dayVal = document.getElementById('birthDay') ? document.getElementById('birthDay').value : '';
+  const monthVal = document.getElementById('birthMonth') ? document.getElementById('birthMonth').value : '';
 
-  const dayVal = document.getElementById('birthDay').value;
-  const monthVal = document.getElementById('birthMonth').value;
-  const yearVal = document.getElementById('birthYear').value.trim();
-
-  const hebrewDayVal = document.getElementById('hebrewDay').value;
-  const hebrewMonthVal = document.getElementById('hebrewMonth').value;
-  const hebrewYearVal = document.getElementById('hebrewYear').value.trim();
+  const hebrewDayVal = document.getElementById('hebrewDay') ? document.getElementById('hebrewDay').value : '';
+  const hebrewMonthVal = document.getElementById('hebrewMonth') ? document.getElementById('hebrewMonth').value : '';
 
   const relation = document.getElementById('personRelation').value.trim();
   const customWish = document.getElementById('customWish').value.trim();
