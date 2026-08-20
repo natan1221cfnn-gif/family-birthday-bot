@@ -441,7 +441,7 @@ function renderBirthdays() {
               ${item.reminderType === 'hebrew' 
                 ? '<span class="card-reminder-tag hebrew-pref">📜 תזכורת לפי עברי</span>' 
                 : '<span class="card-reminder-tag">📅 תזכורת לפי לועזי</span>'}
-              <a href="https://wa.me/972503913171?text=${encodeURIComponent(`היי, אני רוצה לעדכן את כרטיסיית יום ההולדת של ${item.name}`)}" target="_blank" class="card-wa-edit-btn" title="עדכן פרטים בוואטסאפ">
+              <a href="https://wa.me/972504225736?text=${encodeURIComponent(`היי, אני רוצה לעדכן את כרטיסיית יום ההולדת של ${item.name}`)}" target="_blank" class="card-wa-edit-btn" title="עדכן פרטים בוואטסאפ">
                 💬 עדכן בוואטסאפ
               </a>
             </div>
