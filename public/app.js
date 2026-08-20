@@ -382,15 +382,28 @@ async function handleFormSubmit(e) {
   submitBtn.disabled = true;
 
   try {
+    let finalDay = dayVal ? parseInt(dayVal, 10) : null;
+    let finalMonth = monthVal ? parseInt(monthVal, 10) : null;
+    let finalHebDay = hebrewDayVal ? parseInt(hebrewDayVal, 10) : null;
+    let finalHebMonth = hebrewMonthVal || null;
+
+    if (currentCalendarType === 'hebrew') {
+      const greg = convertHebrewToGregorian(finalHebDay, finalHebMonth, 5784);
+      finalDay = greg.day;
+      finalMonth = greg.month;
+    }
+
     const payload = {
       name,
-      dateType: currentCalendarType,
+      dateType: 'gregorian',
       gender,
       reminderType: currentCalendarType,
-      day: dayVal ? parseInt(dayVal, 10) : null,
-      month: monthVal ? parseInt(monthVal, 10) : null,
-      hebrewDay: hebrewDayVal ? parseInt(hebrewDayVal, 10) : null,
-      hebrewMonth: hebrewMonthVal || null,
+      day: finalDay,
+      month: finalMonth,
+      year: 2024,
+      hebrewDay: finalHebDay,
+      hebrewMonth: finalHebMonth,
+      hebrewYear: 5784,
       relation,
       customWish
     };
