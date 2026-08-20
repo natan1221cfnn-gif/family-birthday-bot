@@ -7,7 +7,8 @@ const {
   convertGregorianToHebrew, 
   convertHebrewToGregorian, 
   normalizeHebrewMonth, 
-  parseHebrewYear 
+  parseHebrewYear,
+  toGematriya
 } = require('./lib/hebrewCalendar');
 const bot = require('./bot');
 
