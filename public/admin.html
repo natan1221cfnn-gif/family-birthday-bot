@@ -50,6 +50,24 @@
       height: auto;
       border-radius: 8px;
     }
+    .edit-btn {
+      background: #EBFBEE;
+      color: #2B8A3E;
+      border: 1px solid #B2F2BB;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .edit-btn:hover {
+      background: #2B8A3E;
+      color: white;
+    }
     .delete-btn {
       background: #FFF1F0;
       color: #E03131;
@@ -60,6 +78,9 @@
       font-size: 0.82rem;
       font-weight: 600;
       transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     .delete-btn:hover {
       background: #E03131;
@@ -236,13 +257,13 @@
         </form>
       </section>
 
-      <!-- Manage List & Delete entries -->
+      <!-- Manage List & Delete / Edit entries -->
       <section class="form-card">
         <div class="card-header">
           <div class="card-icon-bubble">📋</div>
           <div>
-            <h2 class="card-title">ניהול ומחיקת רשומות</h2>
-            <p class="card-subtitle">עריכה ומחיקה של ימי הולדת מהרשימה</p>
+            <h2 class="card-title">ניהול, עריכה ומחיקת רשומות</h2>
+            <p class="card-subtitle">עריכת כרטיסיות יום הולדת ומחיקה מהרשימה</p>
           </div>
         </div>
 
@@ -255,8 +276,150 @@
 
   </div>
 
+  <!-- Edit Birthday Modal -->
+  <div id="editModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
+      <button type="button" class="modal-close-btn" id="closeEditModalBtn">✕</button>
+      <div class="card-header" style="border: none; padding-bottom: 0; margin-bottom: 14px;">
+        <div class="card-icon-bubble">✏️</div>
+        <div>
+          <h2 class="card-title">עריכת כרטיסיית יום הולדת</h2>
+          <p class="card-subtitle">עדכון פרטים, תאריכים וברכה אישית</p>
+        </div>
+      </div>
+
+      <form id="editBirthdayForm" class="birthday-form">
+        <input type="hidden" id="editPersonId">
+
+        <div class="form-group">
+          <label for="editPersonName">שם מלא <span class="required">*</span></label>
+          <input type="text" id="editPersonName" required>
+        </div>
+
+        <div class="form-group">
+          <label>פנייה / מגדר</label>
+          <div class="gender-toggle-wrap">
+            <label class="gender-option">
+              <input type="radio" name="editGender" value="male" id="editGenderMale">
+              <span class="gender-btn">👦 זכר (היקר)</span>
+            </label>
+            <label class="gender-option">
+              <input type="radio" name="editGender" value="female" id="editGenderFemale">
+              <span class="gender-btn">👧 נקבה (היקרה)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>סוג תאריך לעריכה</label>
+          <div class="calendar-type-tabs">
+            <button type="button" class="tab-btn active" id="editTabGregorian" onclick="switchEditCalendarType('gregorian')">📅 תאריך לועזי</button>
+            <button type="button" class="tab-btn" id="editTabHebrew" onclick="switchEditCalendarType('hebrew')">📜 תאריך עברי</button>
+          </div>
+        </div>
+
+        <!-- Edit Gregorian Inputs -->
+        <div id="editGregorianDateWrap" class="form-row date-row">
+          <div class="form-group">
+            <label for="editBirthDay">יום לועזי</label>
+            <select id="editBirthDay"></select>
+          </div>
+          <div class="form-group">
+            <label for="editBirthMonth">חודש לועזי</label>
+            <select id="editBirthMonth">
+              <option value="1">ינואר (1)</option>
+              <option value="2">פברואר (2)</option>
+              <option value="3">מרץ (3)</option>
+              <option value="4">אפריל (4)</option>
+              <option value="5">מאי (5)</option>
+              <option value="6">יוני (6)</option>
+              <option value="7">יולי (7)</option>
+              <option value="8">אוגוסט (8)</option>
+              <option value="9">ספטמבר (9)</option>
+              <option value="10">אוקטובר (10)</option>
+              <option value="11">נובמבר (11)</option>
+              <option value="12">דצמבר (12)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editBirthYear">שנת לידה</label>
+            <input type="number" id="editBirthYear" placeholder="1995">
+          </div>
+        </div>
+
+        <!-- Edit Hebrew Inputs -->
+        <div id="editHebrewDateWrap" class="form-row date-row" style="display: none;">
+          <div class="form-group">
+            <label for="editHebrewDay">יום עברי</label>
+            <select id="editHebrewDay"></select>
+          </div>
+          <div class="form-group">
+            <label for="editHebrewMonth">חודש עברי</label>
+            <select id="editHebrewMonth">
+              <option value="תשרי">תשרי</option>
+              <option value="חשוון">חשוון</option>
+              <option value="כסלו">כסלו</option>
+              <option value="טבת">טבת</option>
+              <option value="שבט">שבט</option>
+              <option value="אדר">אדר</option>
+              <option value="ניסן">ניסן</option>
+              <option value="אייר">אייר</option>
+              <option value="סיוון">סיוון</option>
+              <option value="תמוז">תמוז</option>
+              <option value="אב">אב</option>
+              <option value="אלול">אלול</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editHebrewYear">שנה עברית</label>
+            <input type="text" id="editHebrewYear" placeholder="תשנ''ג">
+          </div>
+        </div>
+
+        <!-- Reminder Preference -->
+        <div class="form-group">
+          <label>מתי לשלוח את הברכה בוואטסאפ?</label>
+          <div class="reminder-toggle-wrap">
+            <label class="reminder-option">
+              <input type="radio" name="editReminderType" value="hebrew" id="editReminderHebrew">
+              <span class="reminder-btn">📜 בתאריך העברי</span>
+            </label>
+            <label class="reminder-option">
+              <input type="radio" name="editReminderType" value="gregorian" id="editReminderGregorian">
+              <span class="reminder-btn">📅 בתאריך הלועזי</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="editPersonRelation">קרבה במשפחה</label>
+          <input type="text" id="editPersonRelation" placeholder="הבת של...">
+        </div>
+
+        <div class="form-group">
+          <label for="editCustomWish">איחול אישי או ברכה</label>
+          <textarea id="editCustomWish" rows="2"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 8px;">
+          <button type="submit" class="submit-btn" style="flex: 2;">💾 שמור שינויים</button>
+          <button type="button" class="submit-btn" id="cancelEditBtn" style="flex: 1; background: #EEE9E1; color: #555;">ביטול</button>
+        </div>
+        <div id="editFeedback" class="form-feedback"></div>
+      </form>
+    </div>
+  </div>
+
   <script>
     let token = '';
+    let currentEditCalendarType = 'gregorian';
+    let cachedAdminBirthdays = [];
+
+    const HEBREW_NUMERALS = [
+      "א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ז'", "ח'", "ט'", "י'",
+      "י\"א", "י\"ב", "י\"ג", "י\"ד", "ט\"ו", "ט\"ז", "י\"ז", "י\"ח", "י\"ט", "כ'",
+      "כ\"א", "כ\"ב", "כ\"ג", "כ\"ד", "כ\"ה", "כ\"ו", "כ\"ז", "כ\"ח", "כ\"ט", "ל'"
+    ];
 
     const authScreen = document.getElementById('authScreen');
     const adminContent = document.getElementById('adminContent');
@@ -277,8 +440,38 @@
 
     const logoutBtn = document.getElementById('logoutBtn');
 
+    // Edit Modal Elements
+    const editModal = document.getElementById('editModal');
+    const editBirthdayForm = document.getElementById('editBirthdayForm');
+    const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const editFeedback = document.getElementById('editFeedback');
+
+    // Populate day selects
+    function populateEditDaySelects() {
+      const gDaySelect = document.getElementById('editBirthDay');
+      const hDaySelect = document.getElementById('editHebrewDay');
+      if (gDaySelect && gDaySelect.children.length === 0) {
+        for (let i = 1; i <= 31; i++) {
+          const opt = document.createElement('option');
+          opt.value = i;
+          opt.textContent = i;
+          gDaySelect.appendChild(opt);
+        }
+      }
+      if (hDaySelect && hDaySelect.children.length === 0) {
+        HEBREW_NUMERALS.forEach((num, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx + 1;
+          opt.textContent = `${num} (${idx + 1})`;
+          hDaySelect.appendChild(opt);
+        });
+      }
+    }
+
     // Check existing session token on load
     window.addEventListener('DOMContentLoaded', () => {
+      populateEditDaySelects();
       const savedToken = sessionStorage.getItem('admin_token');
       if (savedToken) {
         token = savedToken;
@@ -546,29 +739,177 @@
       }
     });
 
-    // Load Admin Birthdays List with Delete Action
+    // Load Admin Birthdays List with Edit & Delete Actions
     async function loadAdminBirthdays() {
       try {
         const res = await fetch(`/api/birthdays?t=${Date.now()}`);
-        const list = await res.json();
+        cachedAdminBirthdays = await res.json();
         
-        if (list.length === 0) {
+        if (cachedAdminBirthdays.length === 0) {
           adminBirthdaysList.innerHTML = '<p class="hint-text">אין כרגע רשומות.</p>';
           return;
         }
 
-        adminBirthdaysList.innerHTML = list.map(item => `
-          <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F5; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid #EFE8E0;">
+        adminBirthdaysList.innerHTML = cachedAdminBirthdays.map(item => `
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F5; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid #EFE8E0; flex-wrap: wrap; gap: 8px;">
             <div>
-              <strong>${item.name}</strong> (${item.relation || 'משפחה'}) - ${item.day}/${item.month}${item.year ? '/' + item.year : ''}
+              <strong>${item.name}</strong> 
+              ${item.gender === 'female' ? '👧' : (item.gender === 'male' ? '👦' : '')}
+              <span style="color: #666; font-size: 0.88rem;">(${item.relation || 'משפחה'})</span>
+              <div style="font-size: 0.82rem; color: #777; margin-top: 2px;">
+                📅 ${item.day}/${item.month}${item.year ? '/' + item.year : ''}
+                ${item.hebrewDateStr ? ` • 📜 ${item.hebrewDateStr}` : ''}
+                <span style="background: ${item.reminderType === 'hebrew' ? '#FFF3E0' : '#E8F5E9'}; color: ${item.reminderType === 'hebrew' ? '#E65100' : '#2E7D32'}; padding: 1px 6px; border-radius: 8px; font-weight: 600; margin-right: 4px;">
+                  ${item.reminderType === 'hebrew' ? 'לפי עברי' : 'לפי לועזי'}
+                </span>
+              </div>
             </div>
-            <button class="delete-btn" onclick="deleteBirthday('${item.id}')">🗑️ מחיקה</button>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="edit-btn" onclick="openEditModal('${item.id}')">✏️ עריכה</button>
+              <button type="button" class="delete-btn" onclick="deleteBirthday('${item.id}')">🗑️ מחיקה</button>
+            </div>
           </div>
         `).join('');
       } catch (err) {
         console.error(err);
       }
     }
+
+    // Switch Calendar Tab inside Edit Modal
+    window.switchEditCalendarType = function(type) {
+      currentEditCalendarType = type;
+      const tabGreg = document.getElementById('editTabGregorian');
+      const tabHeb = document.getElementById('editTabHebrew');
+      const gregWrap = document.getElementById('editGregorianDateWrap');
+      const hebWrap = document.getElementById('editHebrewDateWrap');
+
+      if (type === 'hebrew') {
+        tabHeb.classList.add('active');
+        tabGreg.classList.remove('active');
+        hebWrap.style.display = 'grid';
+        gregWrap.style.display = 'none';
+      } else {
+        tabGreg.classList.add('active');
+        tabHeb.classList.remove('active');
+        gregWrap.style.display = 'grid';
+        hebWrap.style.display = 'none';
+      }
+    };
+
+    // Open Edit Modal
+    window.openEditModal = function(id) {
+      const item = cachedAdminBirthdays.find(b => b.id === id);
+      if (!item) return;
+
+      document.getElementById('editPersonId').value = item.id;
+      document.getElementById('editPersonName').value = item.name || '';
+      
+      // Gender
+      if (item.gender === 'female') {
+        document.getElementById('editGenderFemale').checked = true;
+      } else {
+        document.getElementById('editGenderMale').checked = true;
+      }
+
+      // Dates
+      document.getElementById('editBirthDay').value = item.day || 1;
+      document.getElementById('editBirthMonth').value = item.month || 1;
+      document.getElementById('editBirthYear').value = item.year || '';
+
+      document.getElementById('editHebrewDay').value = item.hebrewDay || 1;
+      document.getElementById('editHebrewMonth').value = item.hebrewMonth || 'תשרי';
+      document.getElementById('editHebrewYear').value = item.hebrewYear || '';
+
+      // Reminder Type
+      if (item.reminderType === 'hebrew') {
+        document.getElementById('editReminderHebrew').checked = true;
+        switchEditCalendarType('hebrew');
+      } else {
+        document.getElementById('editReminderGregorian').checked = true;
+        switchEditCalendarType('gregorian');
+      }
+
+      document.getElementById('editPersonRelation').value = item.relation || '';
+      document.getElementById('editCustomWish').value = item.customWish || '';
+
+      editFeedback.style.display = 'none';
+      editModal.style.display = 'flex';
+    };
+
+    // Close Edit Modal
+    function closeEditModal() {
+      editModal.style.display = 'none';
+    }
+    closeEditModalBtn.addEventListener('click', closeEditModal);
+    cancelEditBtn.addEventListener('click', closeEditModal);
+    editModal.addEventListener('click', (e) => {
+      if (e.target === editModal) closeEditModal();
+    });
+
+    // Save Edit Form
+    editBirthdayForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editPersonId').value;
+      const name = document.getElementById('editPersonName').value.trim();
+      const gender = document.querySelector('input[name="editGender"]:checked')?.value || 'male';
+      const reminderType = document.querySelector('input[name="editReminderType"]:checked')?.value || 'gregorian';
+      
+      const day = document.getElementById('editBirthDay').value;
+      const month = document.getElementById('editBirthMonth').value;
+      const year = document.getElementById('editBirthYear').value.trim();
+
+      const hebrewDay = document.getElementById('editHebrewDay').value;
+      const hebrewMonth = document.getElementById('editHebrewMonth').value;
+      const hebrewYear = document.getElementById('editHebrewYear').value.trim();
+
+      const relation = document.getElementById('editPersonRelation').value.trim();
+      const customWish = document.getElementById('editCustomWish').value.trim();
+
+      const activeToken = token || sessionStorage.getItem('admin_token');
+
+      try {
+        const payload = {
+          name,
+          gender,
+          dateType: currentEditCalendarType,
+          day,
+          month,
+          year,
+          hebrewDay,
+          hebrewMonth,
+          hebrewYear,
+          reminderType,
+          relation,
+          customWish
+        };
+
+        const res = await fetch(`/api/admin/birthdays/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${activeToken}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'שגיאה בשמירה');
+
+        editFeedback.textContent = 'הרשומה עודכנה בהצלחה! 🎉';
+        editFeedback.className = 'form-feedback success';
+        editFeedback.style.display = 'block';
+
+        setTimeout(() => {
+          closeEditModal();
+          loadAdminBirthdays();
+        }, 600);
+
+      } catch (err) {
+        editFeedback.textContent = err.message || 'שגיאה בשמירת השינויים';
+        editFeedback.className = 'form-feedback error';
+        editFeedback.style.display = 'block';
+      }
+    });
 
     // Delete Birthday
     window.deleteBirthday = async function(id) {

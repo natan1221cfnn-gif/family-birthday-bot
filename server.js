@@ -344,6 +344,82 @@ app.post('/api/admin/send-test', checkAuth, async (req, res) => {
   }
 });
 
+// Update Birthday
+app.put('/api/admin/birthdays/:id', checkAuth, (req, res) => {
+  const { id } = req.params;
+  const {
+    name,
+    gender,
+    dateType,
+    day,
+    month,
+    year,
+    hebrewDay,
+    hebrewMonth,
+    hebrewYear,
+    reminderType,
+    relation,
+    customWish
+  } = req.body;
+
+  let list = getBirthdays();
+  const index = list.findIndex(item => item.id === id);
+
+  if (index === -1) {
+    return res.status(404).json({ message: 'רשומה לא נמצאה' });
+  }
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({ message: 'שם מלא הינו שדה חובה' });
+  }
+
+  let finalDay = day ? parseInt(day, 10) : null;
+  let finalMonth = month ? parseInt(month, 10) : null;
+  let finalYear = year ? parseInt(year, 10) : null;
+
+  let finalHebDay = hebrewDay ? parseInt(hebrewDay, 10) : null;
+  let finalHebMonth = hebrewMonth || null;
+  let finalHebYear = hebrewYear ? parseInt(hebrewYear, 10) : null;
+  let finalHebDateStr = '';
+
+  if (dateType === 'hebrew' && finalHebDay && finalHebMonth) {
+    const gregInfo = convertHebrewToGregorian(finalHebDay, finalHebMonth, finalHebYear);
+    finalDay = gregInfo.day;
+    finalMonth = gregInfo.month;
+    finalYear = gregInfo.year || null;
+
+    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, finalYear);
+    finalHebDateStr = hebInfo.hebrewDateStr;
+  } else if (finalDay && finalMonth) {
+    const hebInfo = convertGregorianToHebrew(finalDay, finalMonth, finalYear);
+    finalHebDay = hebInfo.hebrewDay;
+    finalHebMonth = hebInfo.hebrewMonth;
+    finalHebDateStr = hebInfo.hebrewDateStr;
+    finalHebYear = hebInfo.hebrewYear;
+  }
+
+  list[index] = {
+    ...list[index],
+    name: name.trim(),
+    gender: gender || list[index].gender || 'unspecified',
+    day: finalDay || list[index].day,
+    month: finalMonth || list[index].month,
+    year: finalYear,
+    hebrewDay: finalHebDay,
+    hebrewMonth: finalHebMonth,
+    hebrewDateStr: finalHebDateStr,
+    hebrewYear: finalHebYear,
+    reminderType: reminderType || list[index].reminderType || 'gregorian',
+    relation: relation ? relation.trim() : '',
+    customWish: customWish ? customWish.trim() : '',
+    updatedAt: new Date().toISOString()
+  };
+
+  saveBirthdays(list);
+  console.log(`[API] ✏️ עודכנה רשומת יום הולדת: ${list[index].name} (${list[index].day}/${list[index].month})`);
+  res.json({ message: 'הרשומה עודכנה בהצלחה! ✅', entry: list[index] });
+});
+
 // Delete Birthday
 app.delete('/api/admin/birthdays/:id', checkAuth, (req, res) => {
   const { id } = req.params;
