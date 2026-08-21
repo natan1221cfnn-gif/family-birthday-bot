@@ -117,12 +117,19 @@ class WhatsAppBot {
         try {
           if (!messages || messages.length === 0) return;
           const msg = messages[0];
-          if (!msg.message || msg.key.fromMe) return;
+          if (!msg.message) return;
+          
+          const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').trim();
+          
+          // Ignore own messages UNLESS they look like our specific commands sent to self
+          if (msg.key.fromMe) {
+             const isCommand = text.startsWith('היי,') || text === 'סיום' || /^[1-6]$/.test(text) || text.startsWith('של ');
+             if (!isCommand) return;
+          }
           
           const fromJid = msg.key.remoteJid;
           if (fromJid.endsWith('@g.us')) return; // Only handle private DMs
 
-          const text = (msg.message.conversation || msg.message.extendedTextMessage?.text || '').trim();
           if (!text) return;
 
           console.log(`[Bot DM] 📩 הודעה מ-${fromJid}: "${text}"`);
