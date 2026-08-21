@@ -264,6 +264,26 @@
         </form>
       </section>
 
+      <!-- Backup & Restore section -->
+      <section class="form-card">
+        <div class="card-header">
+          <div class="card-icon-bubble">💾</div>
+          <div>
+            <h2 class="card-title">גיבוי ושחזור נתונים</h2>
+            <p class="card-subtitle">שמירת עותק גיבוי למחשב/טלפון ושחזור בכל עת בלחיצת כפתור</p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button type="button" id="exportBackupBtn" class="submit-btn" style="flex: 1; min-width: 200px; background: #2B8A3E;" onclick="exportBackupData()">📥 הורדת קובץ גיבוי (JSON)</button>
+          <label class="submit-btn" style="flex: 1; min-width: 200px; background: #4DABF7; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center;">
+            📤 שחזור נתונים מקובץ גיבוי
+            <input type="file" id="importBackupInput" accept=".json" style="display: none;" onchange="importBackupData(event)">
+          </label>
+        </div>
+        <div id="backupFeedback" class="form-feedback"></div>
+      </section>
+
       <!-- Manage List & Delete / Edit entries -->
       <section class="form-card">
         <div class="card-header">
@@ -934,21 +954,71 @@
       }
     });
 
-    // Delete Birthday
-    window.deleteBirthday = async function(id) {
-      if (!confirm('האם אתם בטוחים שברצונכם למחוק רשומה זו?')) return;
+    // Export Backup Data
+    window.exportBackupData = async function() {
       const activeToken = token || sessionStorage.getItem('admin_token');
+      const feedback = document.getElementById('backupFeedback');
       try {
-        const res = await fetch(`/api/admin/birthdays/${id}`, {
-          method: 'DELETE',
-          headers: { 'Authorization': `Bearer ${activeToken}` }
-        });
+        const res = await fetch('/api/birthdays');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'שגיאה במחיקה');
-        loadAdminBirthdays();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `birthdays_backup_${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        feedback.textContent = `קובץ גיבוי עם ${data.length} רשומות הורד בהצלחה! ✅`;
+        feedback.className = 'form-feedback success';
+        feedback.style.display = 'block';
       } catch (err) {
-        alert(err.message || 'שגיאה במחיקה');
+        feedback.textContent = err.message || 'שגיאה בהורדת גיבוי';
+        feedback.className = 'form-feedback error';
+        feedback.style.display = 'block';
       }
+    };
+
+    // Import Backup Data
+    window.importBackupData = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const feedback = document.getElementById('backupFeedback');
+      const activeToken = token || sessionStorage.getItem('admin_token');
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const birthdays = JSON.parse(e.target.result);
+          if (!Array.isArray(birthdays)) throw new Error('מבנה קובץ הגיבוי אינו תקין');
+
+          if (!confirm(`האם אתם בטוחים שברצונכם לשחזר ${birthdays.length} רשומות מקובץ הגיבוי?`)) return;
+
+          const res = await fetch('/api/admin/set-birthdays', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${activeToken}`
+            },
+            body: JSON.stringify({ birthdays })
+          });
+
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || 'שגיאה בשחזור הנתונים');
+
+          feedback.textContent = `הנתונים שוחזרו בהצלחה! נטענו ${birthdays.length} רשומות. 🎉`;
+          feedback.className = 'form-feedback success';
+          feedback.style.display = 'block';
+          loadAdminBirthdays();
+        } catch (err) {
+          feedback.textContent = err.message || 'שגיאה בקריאת קובץ הגיבוי';
+          feedback.className = 'form-feedback error';
+          feedback.style.display = 'block';
+        }
+      };
+      reader.readAsText(file);
     };
 
     // Auto poll status every 10 seconds if admin is active
