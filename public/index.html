@@ -56,8 +56,15 @@
     <!-- Content Grid: Form + List -->
     <main class="content-grid">
       
-      <!-- Add Birthday Form Section -->
-      <section class="form-card">
+      <!-- Toggle Button for Form -->
+      <button id="toggleFormBtn" class="form-toggle-btn" aria-expanded="false" onclick="toggleBirthdayForm()">
+        <span>✨ הצטרפות ללוח החגיגות 🎈</span>
+        <span class="form-toggle-icon" id="formToggleIcon">▼</span>
+      </button>
+
+      <!-- Add Birthday Form Section (Collapsible Wrapper) -->
+      <div id="formWrapper" class="form-card-wrapper">
+        <section class="form-card">
         <div class="card-header">
           <div class="card-icon-bubble">✍️</div>
           <div>
@@ -205,6 +212,7 @@
           <div id="formFeedback" class="form-feedback"></div>
         </form>
       </section>
+      </div>
 
       <!-- Birthday List Section -->
       <section class="list-card">

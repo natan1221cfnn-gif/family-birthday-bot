@@ -445,6 +445,14 @@ async function handleFormSubmit(e) {
     triggerConfetti();
     showFeedback('איזה יופי! נוספת ללוח ימי ההולדת המשפחתי 🎉', 'success');
     birthdayForm.reset();
+    
+    // Close form if it's open (after a short delay for feedback)
+    setTimeout(() => {
+      const wrapper = document.getElementById('formWrapper');
+      if (wrapper && wrapper.classList.contains('open')) {
+        toggleBirthdayForm();
+      }
+    }, 2500);
 
     await loadBirthdays();
 
@@ -685,4 +693,14 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+// Toggle Birthday Form
+function toggleBirthdayForm() {
+  const wrapper = document.getElementById('formWrapper');
+  const icon = document.getElementById('formToggleIcon');
+  const btn = document.getElementById('toggleFormBtn');
+  if(!wrapper || !icon || !btn) return;
+  const isOpen = wrapper.classList.toggle('open');
+  icon.classList.toggle('open');
+  btn.setAttribute('aria-expanded', isOpen);
 }

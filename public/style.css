@@ -286,19 +286,63 @@ body {
 
 /* Grid Layout */
 .content-grid {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 28px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-@media (max-width: 880px) {
-  .content-grid {
-    grid-template-columns: 1fr;
-  }
+#birthdaysList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 /* Card General */
+.form-toggle-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #FFF9F5 0%, #FFF2EB 100%);
+  border: 1.5px solid #F7DFD3;
+  padding: 18px 24px;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent-terracotta);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+  margin-bottom: 4px;
+}
+
+.form-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(216, 112, 83, 0.12);
+}
+
+.form-toggle-icon {
+  font-size: 1.4rem;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.form-toggle-icon.open {
+  transform: rotate(180deg);
+}
+
+.form-card-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+  opacity: 0;
+}
+
+.form-card-wrapper.open {
+  max-height: 1200px; /* Big enough for form */
+  opacity: 1;
+}
+
 .form-card, .list-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
