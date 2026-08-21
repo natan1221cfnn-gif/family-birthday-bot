@@ -784,8 +784,8 @@
               </div>
             </div>
             <div style="display: flex; gap: 6px;">
-              <button type="button" class="edit-btn" onclick="openEditModal('${item.id}')">✏️ עריכה</button>
-              <button type="button" class="delete-btn" onclick="deleteBirthday('${item.id}')">🗑️ מחיקה</button>
+              <button type="button" class="edit-btn" data-id="${escapeHtml(item.id)}" onclick="openEditModal(this.getAttribute('data-id'))">✏️ עריכה</button>
+              <button type="button" class="delete-btn" data-id="${escapeHtml(item.id)}" onclick="deleteBirthday(this.getAttribute('data-id'))">🗑️ מחיקה</button>
             </div>
           </div>
         `;
@@ -793,6 +793,16 @@
       } catch (err) {
         console.error(err);
       }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
     }
 
     // Switch Calendar Tab inside Edit Modal
