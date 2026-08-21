@@ -755,9 +755,16 @@
           return;
         }
 
+        const GREG_MONTHS = ["", "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
+
         adminBirthdaysList.innerHTML = cachedAdminBirthdays.map(item => {
-          const occ = item.nextOccurrence;
-          const isHeb = (item.birthday && item.birthday.calendar === 'hebrew');
+          const occ = item.nextOccurrence || {
+            gregorianShortDisplay: `${item.day || (item.birthday && item.birthday.day) || 1} ב${GREG_MONTHS[item.month || (item.birthday && item.birthday.month) || 1] || ''}`,
+            hebrewShortDisplay: item.hebrewDateStr || '',
+            daysRemaining: '--',
+            isToday: false
+          };
+          const isHeb = (item.birthday && item.birthday.calendar === 'hebrew') || item.reminderType === 'hebrew';
 
           return `
           <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F5; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid #EFE8E0; flex-wrap: wrap; gap: 8px;">
@@ -767,12 +774,12 @@
               <span style="color: #666; font-size: 0.88rem;">(${item.relation || 'משפחה'})</span>
               <div style="font-size: 0.82rem; color: #777; margin-top: 2px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
                 <span>📅 ${occ.gregorianShortDisplay}</span>
-                <span>• 📜 ${occ.hebrewShortDisplay}</span>
+                ${occ.hebrewShortDisplay ? `<span>• 📜 ${occ.hebrewShortDisplay}</span>` : ''}
                 <span style="background: ${isHeb ? '#FFF3E0' : '#E8F5E9'}; color: ${isHeb ? '#E65100' : '#2E7D32'}; padding: 1px 6px; border-radius: 8px; font-weight: 600;">
                   ${isHeb ? 'לפי עברי 📜' : 'לפי לועזי 📅'}
                 </span>
                 <span style="background: #EDE8F5; color: #5B21B6; padding: 1px 6px; border-radius: 8px; font-weight: 600;">
-                  ${occ.isToday ? '🎉 היום!' : (occ.daysRemaining === 1 ? 'מחר!' : `עוד ${occ.daysRemaining} ימים`)}
+                  ${occ.isToday ? '🎉 היום!' : (occ.daysRemaining === 1 ? 'מחר!' : (occ.daysRemaining === '--' ? '' : `עוד ${occ.daysRemaining} ימים`))}
                 </span>
               </div>
             </div>
