@@ -228,6 +228,50 @@ body {
   50% { transform: translateY(-4px); }
 }
 
+/* Birthday Mode & Floating Balloons Celebration */
+.birthday-balloons-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+  overflow: hidden;
+}
+
+.floating-balloon {
+  position: absolute;
+  bottom: -60px;
+  font-size: 2.4rem;
+  animation: floatUp 7s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  opacity: 0.88;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.12));
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(0.85);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.95;
+  }
+  85% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(-115vh) rotate(18deg) scale(1.1);
+    opacity: 0;
+  }
+}
+
+.celebration-glow {
+  background: linear-gradient(135deg, #FFF9EB 0%, #FFF0D4 100%) !important;
+  border: 2px solid #F59E0B !important;
+  box-shadow: 0 10px 32px rgba(245, 158, 11, 0.22) !important;
+}
+
 .days-count {
   font-size: 1.5rem;
   font-weight: 800;

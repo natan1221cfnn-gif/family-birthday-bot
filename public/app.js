@@ -468,6 +468,71 @@ function showFeedback(msg, type) {
 }
 
 // Update the Top Highlight Card (Nearest or Today)
+let celebrationTriggered = false;
+
+function triggerGrandBirthdayCelebration() {
+  if (celebrationTriggered) return;
+  celebrationTriggered = true;
+
+  // 1. Double Confetti Cannons from sides
+  if (typeof confetti === 'function') {
+    const end = Date.now() + 2500;
+    const colors = ['#D87053', '#F59E0B', '#10B981', '#6366F1', '#EC4899', '#FFE5D9'];
+
+    (function frame() {
+      confetti({
+        particleCount: 4,
+        angle: 60,
+        spread: 60,
+        origin: { x: 0, y: 0.7 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 4,
+        angle: 120,
+        spread: 60,
+        origin: { x: 1, y: 0.7 },
+        colors: colors
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
+  }
+
+  // 2. Floating Balloons Animation
+  createFloatingBalloons();
+}
+
+function createFloatingBalloons() {
+  const existing = document.querySelector('.birthday-balloons-container');
+  if (existing) existing.remove();
+
+  const container = document.createElement('div');
+  container.className = 'birthday-balloons-container';
+
+  const balloonIcons = ['🎈', '🎂', '🎉', '🥳', '✨', '💖', '🎈', '🎈'];
+  const count = 16;
+
+  for (let i = 0; i < count; i++) {
+    const b = document.createElement('div');
+    b.className = 'floating-balloon';
+    b.textContent = balloonIcons[Math.floor(Math.random() * balloonIcons.length)];
+    b.style.left = `${Math.random() * 90 + 5}%`;
+    b.style.animationDelay = `${Math.random() * 4}s`;
+    b.style.animationDuration = `${6 + Math.random() * 5}s`;
+    b.style.fontSize = `${2 + Math.random() * 1.2}rem`;
+    container.appendChild(b);
+  }
+
+  document.body.appendChild(container);
+
+  setTimeout(() => {
+    if (container.parentNode) container.remove();
+  }, 14000);
+}
+
 function updateHighlightCard() {
   if (!allBirthdays || !allBirthdays.length) {
     highlightName.textContent = 'עדיין אין ימי הולדת רשומים';
@@ -486,6 +551,7 @@ function updateHighlightCard() {
   const nearest = sorted[0];
   const occ = nearest.occ;
   const person = nearest.item;
+  const highlightCardEl = document.querySelector('.highlight-card');
 
   if (occ.isToday) {
     highlightLabel.textContent = 'חוגגים היום! 🎂';
@@ -495,9 +561,14 @@ function updateHighlightCard() {
     highlightDays.textContent = 'היום!';
     highlightDaysText.textContent = '🎈';
     highlightBadge.className = 'highlight-badge today';
+    if (highlightCardEl) highlightCardEl.classList.add('celebration-glow');
+
+    // Launch Birthday Mode Celebration!
+    triggerGrandBirthdayCelebration();
   } else {
     highlightLabel.textContent = 'יום ההולדת הבא 🎈';
     highlightName.textContent = person.name;
+    if (highlightCardEl) highlightCardEl.classList.remove('celebration-glow');
     
     let descText = `ב-📅 ${occ.gregorianShortDisplay}`;
     if (occ.hebrewShortDisplay) {
