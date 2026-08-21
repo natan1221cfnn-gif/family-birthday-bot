@@ -644,5 +644,423 @@
     "hebrewDateStr": "א׳ באב",
     "reminderType": "hebrew",
     "createdAt": "2026-08-20T17:47:40.085Z"
+  },
+  {
+    "id": "bday_1787317160332_אורית_אלימלך",
+    "name": "אורית אלימלך",
+    "gender": "female",
+    "relation": "הבת של נאוה",
+    "customWish": "",
+    "birthday": {
+      "calendar": "gregorian",
+      "day": 1,
+      "month": 11
+    },
+    "day": 1,
+    "month": 11,
+    "hebrewDay": 21,
+    "hebrewMonth": "חשוון",
+    "hebrewDateStr": "כ״א בחשוון",
+    "reminderType": "gregorian",
+    "createdAt": "2026-08-21T12:59:20.333Z"
+  },
+  {
+    "id": "bday_1787317160337_אביהו_אלימלך",
+    "name": "אביהו אלימלך",
+    "gender": "male",
+    "relation": "בעלה של אורית(הבת של נאוה)",
+    "customWish": "",
+    "birthday": {
+      "calendar": "gregorian",
+      "day": 4,
+      "month": 2
+    },
+    "day": 4,
+    "month": 2,
+    "hebrewDay": 27,
+    "hebrewMonth": "שבט",
+    "hebrewDateStr": "כ״ז בשבט",
+    "reminderType": "gregorian",
+    "createdAt": "2026-08-21T12:59:20.337Z"
+  },
+  {
+    "id": "bday_1787317160337_איתי_אלימלך",
+    "name": "איתי אלימלך",
+    "gender": "male",
+    "relation": "בן של אורית(בת של נאוה)",
+    "customWish": "",
+    "birthday": {
+      "calendar": "gregorian",
+      "day": 25,
+      "month": 12
+    },
+    "day": 25,
+    "month": 12,
+    "hebrewDay": 15,
+    "hebrewMonth": "טבת",
+    "hebrewDateStr": "ט״ו בטבת",
+    "reminderType": "gregorian",
+    "createdAt": "2026-08-21T12:59:20.337Z"
+  },
+  {
+    "id": "bday_1787317160337_נווה_אלימלך",
+    "name": "נווה אלימלך",
+    "gender": "male",
+    "relation": "בן של אורית(בת של נאוה)",
+    "customWish": "",
+    "birthday": {
+      "calendar": "gregorian",
+      "day": 30,
+      "month": 11
+    },
+    "day": 30,
+    "month": 11,
+    "hebrewDay": 20,
+    "hebrewMonth": "כסלו",
+    "hebrewDateStr": "כ׳ בכסלו",
+    "reminderType": "gregorian",
+    "createdAt": "2026-08-21T12:59:20.337Z"
+  },
+  {
+    "id": "bday_1787317160338_נריה_אלימלך",
+    "name": "נריה אלימלך",
+    "gender": "male",
+    "relation": "בן של אורית(בת של נאוה)",
+    "customWish": "",
+    "birthday": {
+      "calendar": "gregorian",
+      "day": 1,
+      "month": 11
+    },
+    "day": 1,
+    "month": 11,
+    "hebrewDay": 21,
+    "hebrewMonth": "חשוון",
+    "hebrewDateStr": "כ״א בחשוון",
+    "reminderType": "gregorian",
+    "createdAt": "2026-08-21T12:59:20.338Z"
+  },
+  {
+    "id": "bday_1787317160338_גבריאל_יצחקוב",
+    "name": "גבריאל יצחקוב",
+    "gender": "male",
+    "relation": "הבן של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 17,
+      "month": "חשוון"
+    },
+    "day": 28,
+    "month": 10,
+    "hebrewDay": 17,
+    "hebrewMonth": "חשוון",
+    "hebrewDateStr": "י״ז בחשוון",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.338Z"
+  },
+  {
+    "id": "bday_1787317160339_בתאל_יצחקוב",
+    "name": "בתאל יצחקוב",
+    "gender": "female",
+    "relation": "הבת של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 16,
+      "month": "טבת"
+    },
+    "day": 26,
+    "month": 12,
+    "hebrewDay": 16,
+    "hebrewMonth": "טבת",
+    "hebrewDateStr": "ט״ז בטבת",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.339Z"
+  },
+  {
+    "id": "bday_1787317160340_מנחם_יצחקוב",
+    "name": "מנחם יצחקוב",
+    "gender": "male",
+    "relation": "הבן של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 8,
+      "month": "שבט"
+    },
+    "day": 16,
+    "month": 1,
+    "hebrewDay": 8,
+    "hebrewMonth": "שבט",
+    "hebrewDateStr": "ח׳ בשבט",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.340Z"
+  },
+  {
+    "id": "bday_1787317160340_מיכאל_יצחקוב",
+    "name": "מיכאל יצחקוב",
+    "gender": "male",
+    "relation": "הבן של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 22,
+      "month": "שבט"
+    },
+    "day": 30,
+    "month": 1,
+    "hebrewDay": 22,
+    "hebrewMonth": "שבט",
+    "hebrewDateStr": "כ״ב בשבט",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.340Z"
+  },
+  {
+    "id": "bday_1787317160341_דניאל_יצחקוב",
+    "name": "דניאל יצחקוב",
+    "gender": "male",
+    "relation": "הבן של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 3,
+      "month": "ניסן"
+    },
+    "day": 10,
+    "month": 4,
+    "hebrewDay": 3,
+    "hebrewMonth": "ניסן",
+    "hebrewDateStr": "ג׳ בניסן",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.341Z"
+  },
+  {
+    "id": "bday_1787317160341_הודיה_יצחקוב",
+    "name": "הודיה יצחקוב",
+    "gender": "female",
+    "relation": "הבת של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 11,
+      "month": "ניסן"
+    },
+    "day": 18,
+    "month": 4,
+    "hebrewDay": 11,
+    "hebrewMonth": "ניסן",
+    "hebrewDateStr": "י״א בניסן",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.341Z"
+  },
+  {
+    "id": "bday_1787317160342_מיכל_יצחקוב",
+    "name": "מיכל יצחקוב",
+    "gender": "female",
+    "relation": "הבת של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 6,
+      "month": "אייר"
+    },
+    "day": 13,
+    "month": 5,
+    "hebrewDay": 6,
+    "hebrewMonth": "אייר",
+    "hebrewDateStr": "ו׳ באייר",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.342Z"
+  },
+  {
+    "id": "bday_1787317160342_נועה_יצחקוב",
+    "name": "נועה יצחקוב",
+    "gender": "female",
+    "relation": "הבת של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 5,
+      "month": "תמוז"
+    },
+    "day": 10,
+    "month": 7,
+    "hebrewDay": 5,
+    "hebrewMonth": "תמוז",
+    "hebrewDateStr": "ה׳ בתמוז",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.342Z"
+  },
+  {
+    "id": "bday_1787317160342_יאיר_יצחקוב",
+    "name": "יאיר יצחקוב",
+    "gender": "male",
+    "relation": "הבן של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 27,
+      "month": "חשוון"
+    },
+    "day": 7,
+    "month": 11,
+    "hebrewDay": 27,
+    "hebrewMonth": "חשוון",
+    "hebrewDateStr": "כ״ז בחשוון",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.342Z"
+  },
+  {
+    "id": "bday_1787317160342_נועם_יצחקוב",
+    "name": "נועם יצחקוב",
+    "gender": "male",
+    "relation": "הבן של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 29,
+      "month": "סיוון"
+    },
+    "day": 4,
+    "month": 7,
+    "hebrewDay": 29,
+    "hebrewMonth": "סיוון",
+    "hebrewDateStr": "כ״ט בסיוון",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.342Z"
+  },
+  {
+    "id": "bday_1787317160342_חגי_יצחקוב",
+    "name": "חגי יצחקוב",
+    "gender": "male",
+    "relation": "הבן של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 13,
+      "month": "אלול"
+    },
+    "day": 26,
+    "month": 8,
+    "hebrewDay": 13,
+    "hebrewMonth": "אלול",
+    "hebrewDateStr": "י״ג באלול",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.342Z"
+  },
+  {
+    "id": "bday_1787317160343_אפרת_יצחקוב",
+    "name": "אפרת יצחקוב",
+    "gender": "female",
+    "relation": "הבת של נופת",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 23,
+      "month": "אלול"
+    },
+    "day": 5,
+    "month": 9,
+    "hebrewDay": 23,
+    "hebrewMonth": "אלול",
+    "hebrewDateStr": "כ״ג באלול",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.343Z"
+  },
+  {
+    "id": "bday_1787317160343_אדל",
+    "name": "אדל",
+    "gender": "female",
+    "relation": "הבת של אבי",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 22,
+      "month": "אלול"
+    },
+    "day": 4,
+    "month": 9,
+    "hebrewDay": 22,
+    "hebrewMonth": "אלול",
+    "hebrewDateStr": "כ״ב באלול",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.343Z"
+  },
+  {
+    "id": "bday_1787317160343_עדי",
+    "name": "עדי",
+    "gender": "female",
+    "relation": "הבת של אבי",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 23,
+      "month": "תמוז"
+    },
+    "day": 28,
+    "month": 7,
+    "hebrewDay": 23,
+    "hebrewMonth": "תמוז",
+    "hebrewDateStr": "כ״ג בתמוז",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.343Z"
+  },
+  {
+    "id": "bday_1787317160343_איתן",
+    "name": "איתן",
+    "gender": "male",
+    "relation": "הבן של אבי",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 10,
+      "month": "חשוון"
+    },
+    "day": 21,
+    "month": 10,
+    "hebrewDay": 10,
+    "hebrewMonth": "חשוון",
+    "hebrewDateStr": "י׳ בחשוון",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.343Z"
+  },
+  {
+    "id": "bday_1787317160344_ז_אנה",
+    "name": "ז'אנה",
+    "gender": "female",
+    "relation": "אשתו של אבי",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 9,
+      "month": "אב"
+    },
+    "day": 12,
+    "month": 8,
+    "hebrewDay": 9,
+    "hebrewMonth": "אב",
+    "hebrewDateStr": "ט׳ באב",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.344Z"
+  },
+  {
+    "id": "bday_1787317160344_אבי",
+    "name": "אבי",
+    "gender": "male",
+    "relation": "בן של סבתא רחל",
+    "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 10,
+      "month": "שבט"
+    },
+    "day": 18,
+    "month": 1,
+    "hebrewDay": 10,
+    "hebrewMonth": "שבט",
+    "hebrewDateStr": "י׳ בשבט",
+    "reminderType": "hebrew",
+    "createdAt": "2026-08-21T12:59:20.344Z"
   }
 ]

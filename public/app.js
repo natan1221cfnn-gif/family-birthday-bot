@@ -391,6 +391,61 @@ async function loadBirthdays() {
   }
 }
 
+// Helper to normalize Hebrew strings for duplicate checks
+function normalizeName(str) {
+  return (str || '')
+    .replace(/[\'\"\״\׳\`\־\-\.]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
+
+function findDuplicatePerson(inputName, inputGender, inputCal, inputDay, inputMonth) {
+  const normInput = normalizeName(inputName);
+  if (!normInput || !allBirthdays || allBirthdays.length === 0) return null;
+
+  return allBirthdays.find(p => {
+    const normPName = normalizeName(p.name);
+    const sameGender = p.gender && inputGender && (p.gender === inputGender || p.gender === 'unspecified' || inputGender === 'unspecified');
+    
+    // Check Date equality
+    const pBday = p.birthday || {};
+    let sameDate = false;
+    if (inputCal === 'gregorian') {
+      const pDay = parseInt(pBday.day || p.day, 10);
+      const pMonth = parseInt(pBday.month || p.month, 10);
+      if (pDay === parseInt(inputDay, 10) && pMonth === parseInt(inputMonth, 10)) {
+        sameDate = true;
+      }
+    } else if (inputCal === 'hebrew') {
+      const pDay = parseInt(pBday.day || p.hebrewDay, 10);
+      const pMonth = (pBday.month || p.hebrewMonth || '').toString().trim();
+      if (pDay === parseInt(inputDay, 10) && normalizeName(pMonth) === normalizeName(inputMonth)) {
+        sameDate = true;
+      }
+    }
+
+    // 1. Exact name match (even if date is different)
+    if (normPName === normInput) {
+      return true;
+    }
+
+    // 2. Contained name (e.g. "אלישע" in "אלישע זגדון") + (same date OR same gender)
+    if (normPName.includes(normInput) || normInput.includes(normPName)) {
+      if (sameDate || sameGender) {
+        return true;
+      }
+    }
+
+    // 3. Same first name + exact same date
+    if (sameDate && (normPName.split(' ')[0] === normInput.split(' ')[0])) {
+      return true;
+    }
+
+    return false;
+  });
+}
+
 // Handle Form Submission
 async function handleFormSubmit(e, force = false) {
   if (e && e.preventDefault) e.preventDefault();
@@ -427,9 +482,13 @@ async function handleFormSubmit(e, force = false) {
     }
   }
 
-  // Duplicate Check
+  // Duplicate Check (Name, Gender, Date)
   if (!force) {
-    const existing = allBirthdays.find(p => p.name.trim().toLowerCase() === name.toLowerCase());
+    const isHeb = currentCalendarType === 'hebrew';
+    const chosenDay = isHeb ? hebrewDayVal : dayVal;
+    const chosenMonth = isHeb ? hebrewMonthVal : monthVal;
+    
+    const existing = findDuplicatePerson(name, gender, currentCalendarType, chosenDay, chosenMonth);
     if (existing) {
       const existingOcc = getSafeOccurrence(existing);
       const duplicateModal = document.getElementById('duplicateModal');
@@ -439,12 +498,13 @@ async function handleFormSubmit(e, force = false) {
       
       if (duplicateModal && duplicateFoundBox) {
         const firstLetter = existing.name.charAt(0);
+        const genderLabel = existing.gender === 'female' ? '👧 נקבה' : (existing.gender === 'male' ? '👦 זכר' : '');
         duplicateFoundBox.innerHTML = `
           <div class="duplicate-person-header">
             <div class="duplicate-avatar">${firstLetter}</div>
             <div>
-              <div class="duplicate-name">${escapeHtml(existing.name)}</div>
-              <div style="font-size: 0.85rem; color: #78350F;">${existing.relation ? escapeHtml(existing.relation) : 'חבר/ת משפחה'}</div>
+              <div class="duplicate-name">${escapeHtml(existing.name)} ${genderLabel ? `<span style="font-size: 0.85rem; font-weight: normal; color: #78350F;">(${genderLabel})</span>` : ''}</div>
+              <div style="font-size: 0.88rem; color: #78350F; font-weight: 500;">${existing.relation ? escapeHtml(existing.relation) : 'חבר/ת משפחה'}</div>
             </div>
           </div>
           <div class="duplicate-details">
@@ -463,6 +523,12 @@ async function handleFormSubmit(e, force = false) {
         btnConfirm.onclick = async () => {
           duplicateModal.style.display = 'none';
           await handleFormSubmit(null, true);
+        };
+
+        duplicateModal.onclick = (event) => {
+          if (event.target === duplicateModal) {
+            duplicateModal.style.display = 'none';
+          }
         };
         
         return;

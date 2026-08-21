@@ -8,15 +8,15 @@ console.log('🚀 Running Full System End-to-End Test...\n');
 
 // 1. Verify DB records
 const birthdays = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', 'birthdays.json'), 'utf8'));
-assert.strictEqual(birthdays.length, 34, 'Expected 34 family members');
+assert.ok(birthdays.length >= 34, `Expected at least 34 family members, got ${birthdays.length}`);
 console.log(`✅ Loaded ${birthdays.length} family members from data/birthdays.json`);
 
 // 2. Enrich all records
 const enriched = dateService.enrichAll(birthdays);
-assert.strictEqual(enriched.length, 34);
-console.log('✅ Successfully enriched all 34 records with nextOccurrence');
+assert.strictEqual(enriched.length, birthdays.length);
+console.log(`✅ Successfully enriched all ${enriched.length} records with nextOccurrence`);
 
-// 3. Verify that all 34 records have valid nextOccurrence fields
+// 3. Verify that all records have valid nextOccurrence fields
 for (const p of enriched) {
   assert.ok(p.nextOccurrence, `Missing nextOccurrence for ${p.name}`);
   assert.ok(p.nextOccurrence.gregorianDisplay, `Missing gregorianDisplay for ${p.name}`);
@@ -24,7 +24,7 @@ for (const p of enriched) {
   assert.ok(typeof p.nextOccurrence.daysRemaining === 'number', `Invalid daysRemaining for ${p.name}`);
   assert.ok(p.nextOccurrence.daysRemaining >= 0, `Negative daysRemaining for ${p.name}`);
 }
-console.log('✅ All 34 records have positive daysRemaining and matching Hebrew & Gregorian displays');
+console.log(`✅ All ${enriched.length} records have positive daysRemaining and matching Hebrew & Gregorian displays`);
 
 // 4. Test User's Specific Example 1: 19 October (Gregorian SSOT)
 const p19Oct = dateService.enrichPersonRecord({
