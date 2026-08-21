@@ -1,175 +1,9 @@
-// Hebrew Month Names (Gregorian months in Hebrew)
-const HEBREW_MONTHS = [
-  'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
-  'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
-];
-
+// Hebrew Month Numerals for Form Select
 const HEBREW_NUMERALS = [
   "א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ז'", "ח'", "ט'", "י'",
   "י\"א", "י\"ב", "י\"ג", "י\"ד", "ט\"ו", "ט\"ז", "י\"ז", "י\"ח", "י\"ט", "כ'",
   "כ\"א", "כ\"ב", "כ\"ג", "כ\"ד", "כ\"ה", "כ\"ו", "כ\"ז", "כ\"ח", "כ\"ט", "ל'"
 ];
-
-// Client-side Jewish Calendar Engine
-function isHebrewLeapYear(year) {
-  return ((7 * year + 1) % 19) < 7;
-}
-
-function hebrewRoshHashanaJdn(year) {
-  const monthsElapsed = Math.floor((235 * year - 234) / 19);
-  const partsElapsed = 31524 + 765433 * monthsElapsed;
-  let day = Math.floor(partsElapsed / 25920);
-  const parts = partsElapsed % 25920;
-
-  if (parts >= 19440) day += 1;
-  let dow = day % 7;
-  if (dow === 0 || dow === 3 || dow === 5) {
-    day += 1;
-  } else if (dow === 2 && parts >= 9924 && !isHebrewLeapYear(year)) {
-    day += 2;
-  } else if (dow === 1 && parts >= 16789 && isHebrewLeapYear(year - 1)) {
-    day += 1;
-  }
-  return day + 347997;
-}
-
-function getDaysInHebrewYear(year) {
-  return hebrewRoshHashanaJdn(year + 1) - hebrewRoshHashanaJdn(year);
-}
-
-function getDaysInHebrewMonth(year, monthIndex) {
-  const isLeap = isHebrewLeapYear(year);
-  const yearLength = getDaysInHebrewYear(year);
-
-  if (monthIndex === 0) return 30; // Tishrei
-  if (monthIndex === 1) return (yearLength === 355 || yearLength === 385) ? 30 : 29; // Cheshvan
-  if (monthIndex === 2) return (yearLength === 353 || yearLength === 383) ? 29 : 30; // Kislev
-  if (monthIndex === 3) return 29; // Tevet
-  if (monthIndex === 4) return 30; // Shvat
-
-  if (isLeap) {
-    if (monthIndex === 5) return 30; // Adar I
-    if (monthIndex === 6) return 29; // Adar II
-    if (monthIndex === 7) return 30; // Nisan
-    if (monthIndex === 8) return 29; // Iyyar
-    if (monthIndex === 9) return 30; // Sivan
-    if (monthIndex === 10) return 29; // Tamuz
-    if (monthIndex === 11) return 30; // Av
-    if (monthIndex === 12) return 29; // Elul
-  } else {
-    if (monthIndex === 5) return 29; // Adar
-    if (monthIndex === 6) return 30; // Nisan
-    if (monthIndex === 7) return 29; // Iyyar
-    if (monthIndex === 8) return 30; // Sivan
-    if (monthIndex === 9) return 29; // Tamuz
-    if (monthIndex === 10) return 30; // Av
-    if (monthIndex === 11) return 29; // Elul
-  }
-  return 29;
-}
-
-function julianToGregorian(jdn) {
-  let a = jdn + 32044;
-  let b = Math.floor((4 * a + 3) / 146097);
-  let c = a - Math.floor((146097 * b) / 4);
-  let d = Math.floor((4 * c + 3) / 1461);
-  let e = c - Math.floor((1461 * d) / 4);
-  let m = Math.floor((5 * e + 2) / 153);
-
-  let day = e - Math.floor((153 * m + 2) / 5) + 1;
-  let month = m + 3 - 12 * Math.floor(m / 10);
-  let year = 100 * b + d - 4800 + Math.floor(m / 10);
-  return { day, month, year };
-}
-
-function gregorianToJulian(year, month, day) {
-  let a = Math.floor((14 - month) / 12);
-  let y = year + 4800 - a;
-  let m = month + 12 * a - 3;
-  return day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
-}
-
-function normalizeHebrewMonth(str) {
-  if (!str) return 'תשרי';
-  const clean = str.toString().trim().toLowerCase();
-  const map = {
-    'tishrei': 'תשרי', 'תשרי': 'תשרי',
-    'cheshvan': 'חשוון', 'חשוון': 'חשוון', 'חשון': 'חשוון', 'marcheshvan': 'חשוון', 'מרחשוון': 'חשוון',
-    'kislev': 'כסלו', 'כסלו': 'כסלו', 'כסליו': 'כסלו',
-    'tevet': 'טבת', 'טבת': 'טבת',
-    'shvat': 'שבט', "sh'vat": 'שבט', 'שבט': 'שבט',
-    'adar': 'אדר', 'אדר': 'אדר', 'adar 1': "אדר א'", 'adar 2': "אדר ב'",
-    'אדר א': "אדר א'", "אדר א'": "אדר א'",
-    'אדר ב': "אדר ב'", "אדר ב'": "אדר ב'",
-    'nisan': 'ניסן', 'ניסן': 'ניסן',
-    'iyyar': 'אייר', 'אייר': 'אייר', 'איר': 'אייר',
-    'sivan': 'סיוון', 'סיוון': 'סיוון', 'סיון': 'סיוון',
-    'tamuz': 'תמוז', 'tammuz': 'תמוז', 'תמוז': 'תמוז',
-    'av': 'אב', 'אב': 'אב', 'menachem av': 'אב', 'מנחם אב': 'אב',
-    'elul': 'אלול', 'אלול': 'אלול'
-  };
-  return map[clean] || map[str.toString().trim()] || 'תשרי';
-}
-
-function convertHebrewToGregorian(hebrewDay, hebrewMonthInput, hebrewYearInput) {
-  const normMonth = normalizeHebrewMonth(hebrewMonthInput);
-  const hYear = parseInt(hebrewYearInput, 10) || 5784;
-  const hDay = parseInt(hebrewDay, 10) || 1;
-
-  const isLeap = isHebrewLeapYear(hYear);
-  const monthNames = isLeap
-    ? ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר א'", "אדר ב'", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]
-    : ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
-
-  let mIndex = monthNames.indexOf(normMonth);
-  if (mIndex === -1) {
-    if (normMonth === "אדר א'" || normMonth === "אדר ב'") mIndex = 5;
-    else mIndex = 0;
-  }
-
-  let jdn = hebrewRoshHashanaJdn(hYear);
-  for (let i = 0; i < mIndex; i++) {
-    jdn += getDaysInHebrewMonth(hYear, i);
-  }
-  jdn += (hDay - 1);
-  return julianToGregorian(jdn);
-}
-
-function convertGregorianToHebrew(day, month, year) {
-  const gYear = year ? parseInt(year, 10) : 2024;
-  const gMonth = parseInt(month, 10);
-  const gDay = parseInt(day, 10);
-
-  const jdn = gregorianToJulian(gYear, gMonth, gDay);
-
-  let hYear = gYear + 3760;
-  while (hebrewRoshHashanaJdn(hYear + 1) <= jdn) {
-    hYear++;
-  }
-  while (hebrewRoshHashanaJdn(hYear) > jdn) {
-    hYear--;
-  }
-
-  let daysSinceRH = jdn - hebrewRoshHashanaJdn(hYear);
-  let mIndex = 0;
-  while (true) {
-    let dim = getDaysInHebrewMonth(hYear, mIndex);
-    if (daysSinceRH < dim) break;
-    daysSinceRH -= dim;
-    mIndex++;
-  }
-
-  const isLeap = isHebrewLeapYear(hYear);
-  const monthNames = isLeap
-    ? ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר א'", "אדר ב'", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"]
-    : ["תשרי", "חשוון", "כסלו", "טבת", "שבט", "אדר", "ניסן", "אייר", "סיוון", "תמוז", "אב", "אלול"];
-
-  return {
-    hebrewDay: daysSinceRH + 1,
-    hebrewMonth: monthNames[mIndex],
-    hebrewYear: hYear
-  };
-}
 
 let allBirthdays = [];
 let currentCalendarType = 'gregorian';
@@ -203,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Populate Gregorian Day Options (1 to 31)
 function populateDayOptions() {
+  if (!birthDaySelect) return;
   for (let i = 1; i <= 31; i++) {
     const opt = document.createElement('option');
     opt.value = i;
@@ -319,7 +154,7 @@ function setupEventListeners() {
   }
 }
 
-// Fetch Birthdays from Backend
+// Fetch Birthdays from Backend (already enriched & sorted by closest birthday)
 async function loadBirthdays() {
   try {
     const res = await fetch(`/api/birthdays?t=${Date.now()}`);
@@ -382,30 +217,17 @@ async function handleFormSubmit(e) {
   submitBtn.disabled = true;
 
   try {
-    let finalDay = dayVal ? parseInt(dayVal, 10) : null;
-    let finalMonth = monthVal ? parseInt(monthVal, 10) : null;
-    let finalHebDay = hebrewDayVal ? parseInt(hebrewDayVal, 10) : null;
-    let finalHebMonth = hebrewMonthVal || null;
-
-    if (currentCalendarType === 'hebrew') {
-      const greg = convertHebrewToGregorian(finalHebDay, finalHebMonth, 5784);
-      finalDay = greg.day;
-      finalMonth = greg.month;
-    }
-
+    const isHeb = currentCalendarType === 'hebrew';
     const payload = {
       name,
-      dateType: 'gregorian',
       gender,
-      reminderType: currentCalendarType,
-      day: finalDay,
-      month: finalMonth,
-      year: 2024,
-      hebrewDay: finalHebDay,
-      hebrewMonth: finalHebMonth,
-      hebrewYear: 5784,
       relation,
-      customWish
+      customWish,
+      birthday: {
+        calendar: currentCalendarType,
+        day: isHeb ? parseInt(hebrewDayVal, 10) : parseInt(dayVal, 10),
+        month: isHeb ? hebrewMonthVal : parseInt(monthVal, 10)
+      }
     };
 
     const res = await fetch('/api/birthdays', {
@@ -448,61 +270,6 @@ function showFeedback(msg, type) {
   }, 5000);
 }
 
-// Calculate Days until next birthday
-function getBirthdayCalculations(item) {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
-  const currentDay = now.getDate();
-  const todayMidnight = new Date(currentYear, currentMonth - 1, currentDay);
-
-  let isToday = false;
-  let diffDays = 0;
-  let targetYear = currentYear;
-
-  if (item.reminderType === 'hebrew' && item.hebrewDay && item.hebrewMonth) {
-    // Hebrew countdown calculation
-    const todayHeb = convertGregorianToHebrew(currentDay, currentMonth, currentYear);
-    const normMonth = normalizeHebrewMonth(item.hebrewMonth);
-    
-    // Check if today is Hebrew birthday
-    if (todayHeb.hebrewDay === item.hebrewDay && todayHeb.hebrewMonth === normMonth) {
-      isToday = true;
-      diffDays = 0;
-    } else {
-      let hYear = todayHeb.hebrewYear;
-      let gregThisHebYear = convertHebrewToGregorian(item.hebrewDay, normMonth, hYear);
-      let targetDate = new Date(gregThisHebYear.year, gregThisHebYear.month - 1, gregThisHebYear.day);
-
-      if (targetDate < todayMidnight) {
-        // Hebrew birthday already occurred this Hebrew year -> next occurrence is in hYear + 1
-        let gregNextHebYear = convertHebrewToGregorian(item.hebrewDay, normMonth, hYear + 1);
-        targetDate = new Date(gregNextHebYear.year, gregNextHebYear.month - 1, gregNextHebYear.day);
-      }
-
-      const diffTime = targetDate.getTime() - todayMidnight.getTime();
-      diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-    }
-  } else {
-    // Gregorian countdown calculation
-    isToday = (item.month === currentMonth && item.day === currentDay);
-    let bdayThisYear = new Date(currentYear, item.month - 1, item.day);
-    
-    if (bdayThisYear < todayMidnight && !isToday) {
-      targetYear = currentYear + 1;
-    }
-    let nextBday = new Date(targetYear, item.month - 1, item.day);
-    const diffTime = nextBday.getTime() - todayMidnight.getTime();
-    diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-  }
-
-  return {
-    isToday,
-    daysUntil: isToday ? 0 : diffDays,
-    formattedDate: `${item.day} ב${HEBREW_MONTHS[item.month - 1]}`
-  };
-}
-
 // Update the Top Highlight Card (Nearest or Today)
 function updateHighlightCard() {
   if (!allBirthdays.length) {
@@ -513,15 +280,11 @@ function updateHighlightCard() {
     return;
   }
 
-  // Sort by days until
-  const sorted = [...allBirthdays].map(item => ({
-    ...item,
-    calc: getBirthdayCalculations(item)
-  })).sort((a, b) => a.calc.daysUntil - b.calc.daysUntil);
+  // First item is always the closest because backend sorts by daysRemaining
+  const nearest = allBirthdays[0];
+  const occ = nearest.nextOccurrence;
 
-  const nearest = sorted[0];
-
-  if (nearest.calc.isToday) {
+  if (occ.isToday) {
     highlightLabel.textContent = 'חוגגים היום! 🎂';
     highlightName.textContent = nearest.name;
     const verb = nearest.gender === 'female' ? 'חוגגת' : (nearest.gender === 'male' ? 'חוגג' : 'חוגג/ת');
@@ -533,11 +296,10 @@ function updateHighlightCard() {
     highlightLabel.textContent = 'יום ההולדת הבא 🎈';
     highlightName.textContent = nearest.name;
     
-    let hebrewDateExtra = nearest.hebrewDateStr ? ` • 📜 ${nearest.hebrewDateStr}` : '';
-    highlightDesc.textContent = `ב-📅 ${nearest.calc.formattedDate}${hebrewDateExtra}`;
+    highlightDesc.textContent = `ב-📅 ${occ.gregorianShortDisplay} • 📜 ${occ.hebrewShortDisplay}`;
     
-    highlightDays.textContent = nearest.calc.daysUntil;
-    highlightDaysText.textContent = nearest.calc.daysUntil === 1 ? 'מחר!' : 'ימים';
+    highlightDays.textContent = occ.daysRemaining;
+    highlightDaysText.textContent = occ.daysRemaining === 1 ? 'מחר!' : 'ימים';
     highlightBadge.className = 'highlight-badge';
   }
 }
@@ -548,18 +310,14 @@ function renderBirthdays() {
   const selectedMonth = monthFilter.value;
 
   let filtered = allBirthdays.filter(item => {
+    const occ = item.nextOccurrence;
     const matchName = item.name.toLowerCase().includes(searchTerm) || 
                       (item.relation && item.relation.toLowerCase().includes(searchTerm)) ||
-                      (item.hebrewDateStr && item.hebrewDateStr.includes(searchTerm));
-    const matchMonth = (selectedMonth === 'all' || item.month.toString() === selectedMonth);
+                      (occ.hebrewDisplay && occ.hebrewDisplay.includes(searchTerm)) ||
+                      (occ.gregorianDisplay && occ.gregorianDisplay.includes(searchTerm));
+                      
+    const matchMonth = (selectedMonth === 'all' || occ.gregorianMonth.toString() === selectedMonth);
     return matchName && matchMonth;
-  });
-
-  // Sort by upcoming date
-  filtered.sort((a, b) => {
-    const calcA = getBirthdayCalculations(a);
-    const calcB = getBirthdayCalculations(b);
-    return calcA.daysUntil - calcB.daysUntil;
   });
 
   totalCounter.textContent = `${allBirthdays.length} רשומים`;
@@ -575,11 +333,12 @@ function renderBirthdays() {
   }
 
   birthdaysList.innerHTML = filtered.map(item => {
-    const calc = getBirthdayCalculations(item);
+    const occ = item.nextOccurrence;
     const firstLetter = item.name.charAt(0);
+    const isHebrewPref = (item.birthday && item.birthday.calendar === 'hebrew');
 
     return `
-      <div class="birthday-item ${calc.isToday ? 'is-today' : ''}">
+      <div class="birthday-item ${occ.isToday ? 'is-today' : ''}">
         <div class="birthday-left">
           <div class="avatar-circle">${firstLetter}</div>
           <div class="item-info">
@@ -588,12 +347,12 @@ function renderBirthdays() {
               ${item.relation ? `<span class="item-relation">${escapeHtml(item.relation)}</span>` : ''}
             </div>
             <div class="item-date">
-              <span>📅 ${calc.formattedDate}</span>
-              ${item.hebrewDateStr ? `<span class="card-hebrew-date">• 📜 ${escapeHtml(item.hebrewDateStr)}</span>` : ''}
+              <span>📅 ${occ.gregorianShortDisplay}</span>
+              <span class="card-hebrew-date">• 📜 ${escapeHtml(occ.hebrewShortDisplay)}</span>
             </div>
             <div class="item-wish">${item.customWish ? `"${escapeHtml(item.customWish)}"` : '✨ "מאחלים שפע של בריאות, שמחה והגשמת חלומות!"'}</div>
             <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
-              ${item.reminderType === 'hebrew' 
+              ${isHebrewPref 
                 ? '<span class="card-reminder-tag hebrew-pref">📜 תזכורת לפי עברי</span>' 
                 : '<span class="card-reminder-tag">📅 תזכורת לפי לועזי</span>'}
               <a href="https://wa.me/972504225736?text=${encodeURIComponent(`היי, אני רוצה לעדכן את כרטיסיית יום ההולדת של ${item.name}`)}" target="_blank" class="card-wa-edit-btn" title="עדכן פרטים בוואטסאפ">
@@ -605,7 +364,7 @@ function renderBirthdays() {
 
         <div class="birthday-right">
           <span class="countdown-pill">
-            ${calc.isToday ? '🎉 היום!' : (calc.daysUntil === 1 ? 'מחר!' : `עוד ${calc.daysUntil} ימים`)}
+            ${occ.isToday ? '🎉 היום!' : (occ.daysRemaining === 1 ? 'מחר!' : `עוד ${occ.daysRemaining} ימים`)}
           </span>
         </div>
       </div>

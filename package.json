@@ -7,7 +7,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@hebcal/core": "^5.8.10",
+    "@hebcal/core": "^5.10.1",
     "@whiskeysockets/baileys": "^7.0.0-rc14",
     "cors": "^2.8.5",
     "express": "^4.19.2",

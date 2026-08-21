@@ -3,476 +3,442 @@
     "id": "bday_1_ורד_דידי",
     "name": "ורד דידי",
     "gender": "female",
-    "day": 27,
-    "month": 6,
-    "hebrewDay": 4,
-    "hebrewMonth": "תמוז",
-    "hebrewDateStr": "ד' בתמוז ת\"ש",
-    "reminderType": "hebrew",
     "relation": "הבת של נאוה",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 4,
+      "month": "תמוז"
+    },
     "createdAt": "2026-08-20T17:47:40.076Z"
   },
   {
     "id": "bday_2_יוסי_דידי",
     "name": "יוסי דידי",
     "gender": "male",
-    "day": 2,
-    "month": 4,
-    "hebrewDay": 18,
-    "hebrewMonth": "ניסן",
-    "hebrewDateStr": "י\"ח בניסן",
-    "reminderType": "hebrew",
     "relation": "בעלה של ורד(הבת של נאוה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 18,
+      "month": "ניסן"
+    },
     "createdAt": "2026-08-20T17:47:40.080Z"
   },
   {
     "id": "bday_3_ציון_טהרני",
     "name": "ציון טהרני",
     "gender": "male",
-    "day": 7,
-    "month": 7,
-    "hebrewDay": 6,
-    "hebrewMonth": "תמוז",
-    "hebrewDateStr": "ו' בתמוז",
-    "reminderType": "hebrew",
     "relation": "",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 6,
+      "month": "תמוז"
+    },
     "createdAt": "2026-08-20T17:47:40.080Z"
   },
   {
     "id": "bday_4_פנינה_טהרני",
     "name": "פנינה טהרני",
     "gender": "female",
-    "day": 21,
-    "month": 3,
-    "hebrewDay": 28,
-    "hebrewMonth": "אדר",
-    "hebrewDateStr": "כ\"ח באדר",
-    "reminderType": "hebrew",
     "relation": "הבת של נאוה",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 28,
+      "month": "אדר"
+    },
     "createdAt": "2026-08-20T17:47:40.081Z"
   },
   {
     "id": "bday_5_דנה_כהן",
     "name": "דנה כהן",
     "gender": "female",
-    "day": 10,
-    "month": 7,
-    "hebrewDay": 21,
-    "hebrewMonth": "תמוז",
-    "hebrewDateStr": "כ\"א בתמוז",
-    "reminderType": "hebrew",
     "relation": "הבת של נופת",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 21,
+      "month": "תמוז"
+    },
     "createdAt": "2026-08-20T17:47:40.081Z"
   },
   {
     "id": "bday_6_יאיר_עג'מי",
     "name": "יאיר עג'מי",
     "gender": "male",
-    "day": 20,
-    "month": 5,
-    "hebrewDay": 24,
-    "hebrewMonth": "אייר",
-    "hebrewDateStr": "כ\"ד באייר",
-    "reminderType": "hebrew",
     "relation": "הבן של ניצה",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 24,
+      "month": "אייר"
+    },
     "createdAt": "2026-08-20T17:47:40.082Z"
   },
   {
     "id": "bday_7_אודיה_עג'מי",
     "name": "אודיה עג'מי",
     "gender": "female",
-    "day": 4,
-    "month": 9,
-    "hebrewDay": 24,
-    "hebrewMonth": "אלול",
-    "hebrewDateStr": "כ\"ד באלול",
-    "reminderType": "hebrew",
     "relation": "אשתו של יאיר(הבן של ניצה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 24,
+      "month": "אלול"
+    },
     "createdAt": "2026-08-20T17:47:40.082Z"
   },
   {
     "id": "bday_8_תמר_דידי",
     "name": "תמר דידי",
     "gender": "female",
-    "day": 29,
-    "month": 10,
-    "hebrewDay": 25,
-    "hebrewMonth": "חשוון",
-    "hebrewDateStr": "כ\"ה בחשוון",
-    "reminderType": "hebrew",
     "relation": "הבת של ורד (הבת של נאוה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 25,
+      "month": "חשוון"
+    },
     "createdAt": "2026-08-20T17:47:40.084Z"
   },
   {
     "id": "bday_9_יאיר_דידי",
     "name": "יאיר דידי",
     "gender": "male",
-    "day": 28,
-    "month": 7,
-    "hebrewDay": 20,
-    "hebrewMonth": "תמוז",
-    "hebrewDateStr": "כ' בתמוז",
-    "reminderType": "hebrew",
     "relation": "הבן של ורד (הבת של נאוה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 20,
+      "month": "תמוז"
+    },
     "createdAt": "2026-08-20T17:47:40.084Z"
   },
   {
     "id": "bday_10_עדי_דידי",
     "name": "עדי דידי",
     "gender": "female",
-    "day": 23,
-    "month": 4,
-    "hebrewDay": 18,
-    "hebrewMonth": "ניסן",
-    "hebrewDateStr": "י\"ח בניסן",
-    "reminderType": "hebrew",
     "relation": "הבת של ורד (הבת של נאוה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 18,
+      "month": "ניסן"
+    },
     "createdAt": "2026-08-20T17:47:40.084Z"
   },
   {
     "id": "bday_11_נועה_דידי",
     "name": "נועה דידי",
     "gender": "female",
-    "day": 17,
-    "month": 1,
-    "hebrewDay": 15,
-    "hebrewMonth": "שבט",
-    "hebrewDateStr": "ט\"ו בשבט",
-    "reminderType": "hebrew",
     "relation": "הבת של ורד (הבת של נאוה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 15,
+      "month": "שבט"
+    },
     "createdAt": "2026-08-20T17:47:40.084Z"
   },
   {
     "id": "bday_12_הללי_עג'מי",
     "name": "הללי עג'מי",
     "gender": "female",
-    "day": 28,
-    "month": 7,
-    "hebrewDay": 1,
-    "hebrewMonth": "אב",
-    "hebrewDateStr": "א' באב",
-    "reminderType": "hebrew",
     "relation": "הבת של יאיר (הבן של ניצה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 1,
+      "month": "אב"
+    },
     "createdAt": "2026-08-20T17:47:40.085Z"
   },
   {
     "id": "bday_13_הראל_דידי",
     "name": "הראל דידי",
     "gender": "male",
-    "day": 18,
-    "month": 6,
-    "hebrewDay": 20,
-    "hebrewMonth": "סיוון",
-    "hebrewDateStr": "כ' בסיוון",
-    "reminderType": "hebrew",
     "relation": "הבן של ורד (הבת של נאוה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 20,
+      "month": "סיוון"
+    },
     "createdAt": "2026-08-20T17:47:40.085Z"
   },
   {
     "id": "bday_14_הדס_דידי",
     "name": "הדס דידי",
     "gender": "female",
-    "day": 18,
-    "month": 6,
-    "hebrewDay": 20,
-    "hebrewMonth": "סיוון",
-    "hebrewDateStr": "כ' בסיוון",
-    "reminderType": "hebrew",
     "relation": "הבת של ורד (הבת של נאוה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 20,
+      "month": "סיוון"
+    },
     "createdAt": "2026-08-20T17:47:40.085Z"
   },
   {
     "id": "bday_15_אליה_עג'מי",
     "name": "אליה עג'מי",
     "gender": "male",
-    "day": 15,
-    "month": 9,
-    "hebrewDay": 20,
-    "hebrewMonth": "אלול",
-    "hebrewDateStr": "כ' באלול",
-    "reminderType": "hebrew",
     "relation": "הבן של יאיר(הבן של ניצה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 20,
+      "month": "אלול"
+    },
     "createdAt": "2026-08-20T17:47:40.085Z"
   },
   {
     "id": "bday_16_אריאל_דוד_יצחקוב",
     "name": "אריאל דוד יצחקוב",
     "gender": "male",
-    "day": 7,
-    "month": 6,
-    "hebrewDay": 25,
-    "hebrewMonth": "סיוון",
-    "hebrewDateStr": "כ\"ה בסיוון",
-    "reminderType": "hebrew",
     "relation": "הבן של נופת",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 25,
+      "month": "סיוון"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_17_אלעזר_אוריין",
     "name": "אלעזר אוריין",
     "gender": "male",
-    "day": 15,
-    "month": 11,
-    "hebrewDay": 20,
-    "hebrewMonth": "חשוון",
-    "hebrewDateStr": "כ' בחשוון",
-    "reminderType": "hebrew",
     "relation": "בעלה של יסכה (הבת של ניצה)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 20,
+      "month": "חשוון"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_18_יסכה_אוריין",
     "name": "יסכה אוריין",
     "gender": "female",
-    "day": 21,
-    "month": 4,
-    "hebrewDay": 19,
-    "hebrewMonth": "ניסן",
-    "hebrewDateStr": "י\"ט בניסן",
-    "reminderType": "hebrew",
     "relation": "הבת של ניצה",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 19,
+      "month": "ניסן"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_19_עמוס_כהן",
     "name": "עמוס כהן",
     "gender": "male",
-    "day": 20,
-    "month": 12,
-    "hebrewDay": 6,
-    "hebrewMonth": "טבת",
-    "hebrewDateStr": "ו' בטבת",
-    "reminderType": "hebrew",
     "relation": "בעלה של דנה (הבת של נופת)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 6,
+      "month": "טבת"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_20_יעל_כהן",
     "name": "יעל כהן",
     "gender": "female",
-    "day": 19,
-    "month": 10,
-    "hebrewDay": 24,
-    "hebrewMonth": "תשרי",
-    "hebrewDateStr": "כ\"ד בתשרי",
-    "reminderType": "hebrew",
     "relation": "הבת של דנה (הבת של נופת)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 24,
+      "month": "תשרי"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_21_יסכה_כהן",
     "name": "יסכה כהן",
     "gender": "female",
-    "day": 31,
-    "month": 1,
-    "hebrewDay": 3,
-    "hebrewMonth": "שבט",
-    "hebrewDateStr": "ג' בשבט",
-    "reminderType": "hebrew",
     "relation": "הבת של דנה (הבת של נופת)",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 3,
+      "month": "שבט"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_22_נעם_עג'מי",
     "name": "נעם עג'מי",
     "gender": "male",
-    "day": 12,
-    "month": 6,
-    "hebrewDay": 14,
-    "hebrewMonth": "סיוון",
-    "hebrewDateStr": "י\"ד בסיוון",
-    "reminderType": "hebrew",
     "relation": "הבן של ניצה",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 14,
+      "month": "סיוון"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_23_אוריה_עג'מי",
     "name": "אוריה עג'מי",
     "gender": "female",
-    "day": 3,
-    "month": 3,
-    "hebrewDay": 1,
-    "hebrewMonth": "אדר",
-    "hebrewDateStr": "א' באדר",
-    "reminderType": "hebrew",
     "relation": "אשתו של נעם",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 1,
+      "month": "אדר"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_24_רני_עג'מי",
     "name": "רני עג'מי",
     "gender": "female",
-    "day": 25,
-    "month": 6,
-    "hebrewDay": 10,
-    "hebrewMonth": "תמוז",
-    "hebrewDateStr": "י' בתמוז",
-    "reminderType": "hebrew",
     "relation": "הבת של נעם ואוריה",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 10,
+      "month": "תמוז"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_25_זגדון_יקירה",
     "name": "זגדון יקירה",
     "gender": "female",
-    "day": 18,
-    "month": 11,
-    "hebrewDay": 5,
-    "hebrewMonth": "כסלו",
-    "hebrewDateStr": "ה' בכסלו",
-    "reminderType": "hebrew",
     "relation": "אשת אלישע",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 5,
+      "month": "כסלו"
+    },
     "createdAt": "2026-08-20T17:47:40.086Z"
   },
   {
     "id": "bday_26_יערה_זגדון",
     "name": "יערה זגדון",
     "gender": "female",
-    "day": 25,
-    "month": 1,
-    "hebrewDay": 15,
-    "hebrewMonth": "שבט",
-    "hebrewDateStr": "ט\"ו בשבט",
-    "reminderType": "hebrew",
     "relation": "הבת של אלישע",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 15,
+      "month": "שבט"
+    },
     "createdAt": "2026-08-20T17:47:40.087Z"
   },
   {
     "id": "bday_27_אמיר_זגדון",
     "name": "אמיר זגדון",
     "gender": "male",
-    "day": 16,
-    "month": 1,
-    "hebrewDay": 6,
-    "hebrewMonth": "שבט",
-    "hebrewDateStr": "ו' בשבט",
-    "reminderType": "hebrew",
     "relation": "בן של אלישע",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 6,
+      "month": "שבט"
+    },
     "createdAt": "2026-08-20T17:47:40.087Z"
   },
   {
     "id": "bday_28_אלישע_זגדון",
     "name": "אלישע זגדון",
     "gender": "male",
-    "day": 29,
-    "month": 9,
-    "hebrewDay": 14,
-    "hebrewMonth": "תשרי",
-    "hebrewDateStr": "י\"ד בתשרי",
-    "reminderType": "hebrew",
     "relation": "בן של סבתא רחל וסבא כדיר",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 14,
+      "month": "תשרי"
+    },
     "createdAt": "2026-08-20T17:47:40.087Z"
   },
   {
     "id": "bday_29_ניצנית_עג'מי_(ניצה)",
     "name": "ניצנית עג'מי (ניצה)",
     "gender": "female",
-    "day": 11,
-    "month": 3,
-    "hebrewDay": 18,
-    "hebrewMonth": "אדר",
-    "hebrewDateStr": "י\"ח באדר",
-    "reminderType": "hebrew",
     "relation": "",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 18,
+      "month": "אדר"
+    },
     "createdAt": "2026-08-20T17:47:40.087Z"
   },
   {
     "id": "bday_30_בעז_עג'מי_(בעלה_של_ניצה)",
     "name": "בעז עג'מי (בעלה של ניצה)",
     "gender": "male",
-    "day": 13,
-    "month": 6,
-    "hebrewDay": 1,
-    "hebrewMonth": "תמוז",
-    "hebrewDateStr": "א' בתמוז",
-    "reminderType": "hebrew",
     "relation": "",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 1,
+      "month": "תמוז"
+    },
     "createdAt": "2026-08-20T17:47:40.087Z"
   },
   {
     "id": "bday_31_גילעד_עג'מי",
     "name": "גילעד עג'מי",
     "gender": "male",
-    "day": 18,
-    "month": 12,
-    "hebrewDay": 17,
-    "hebrewMonth": "כסלו",
-    "hebrewDateStr": "י\"ז בכסלו",
-    "reminderType": "hebrew",
     "relation": "בן של ניצה",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 17,
+      "month": "כסלו"
+    },
     "createdAt": "2026-08-20T17:47:40.087Z"
   },
   {
     "id": "bday_32_עינת_עג'מי",
     "name": "עינת עג'מי",
     "gender": "female",
-    "day": 15,
-    "month": 12,
-    "hebrewDay": 18,
-    "hebrewMonth": "כסלו",
-    "hebrewDateStr": "י\"ח בכסלו",
-    "reminderType": "hebrew",
     "relation": "בת של ניצה",
     "customWish": "",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 18,
+      "month": "כסלו"
+    },
     "createdAt": "2026-08-20T17:47:40.087Z"
   },
   {
     "id": "bday_1787241601658_11ywf",
     "name": "יונתן בידה",
     "gender": "male",
-    "day": 2,
-    "month": 12,
-    "hebrewDay": 8,
-    "hebrewMonth": "כסלו",
-    "hebrewDateStr": "ח' בכסלו",
-    "reminderType": "hebrew",
     "relation": "הבן של בתאל לבית יצחקוב",
     "customWish": "מאחלים לך שפע של בריאות, שמחה, אהבה והגשמת כל החלומות! ✨",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 8,
+      "month": "כסלו"
+    },
     "createdAt": "2026-08-20T16:00:01.658Z"
   },
   {
     "id": "bday_1787240921102_he0p7",
     "name": "שני בידה",
     "gender": "female",
-    "day": 2,
-    "month": 10,
-    "hebrewDay": 17,
-    "hebrewMonth": "תשרי",
-    "hebrewDateStr": "י\"ז בתשרי",
-    "reminderType": "hebrew",
     "relation": "הבת של בתאל לבית יצחקוב",
     "customWish": "עד 120 בבריאות, אושר והמון חיוכים! 🎈",
+    "birthday": {
+      "calendar": "hebrew",
+      "day": 17,
+      "month": "תשרי"
+    },
     "createdAt": "2026-08-20T15:48:41.102Z"
   }
 ]

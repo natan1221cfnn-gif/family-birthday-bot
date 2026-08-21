@@ -5,13 +5,7 @@ const qrcode = require('qrcode');
 const qrcodeTerminal = require('qrcode-terminal');
 const path = require('path');
 const fs = require('fs');
-const { 
-  convertGregorianToHebrew, 
-  convertHebrewToGregorian, 
-  toGematriya,
-  normalizeHebrewMonth,
-  parseHebrewYear
-} = require('./lib/hebrewCalendar');
+const dateService = require('./lib/dateService');
 const { parseHebrewDateString } = require('./lib/hebrewDateParser');
 
 class WhatsAppBot {
@@ -262,16 +256,15 @@ class WhatsAppBot {
       let day = parseInt(match[1], 10);
       let month = parseInt(match[2], 10);
 
-      const hConv = convertGregorianToHebrew(day, month, 2024);
-      list[pIndex].day = day;
-      list[pIndex].month = month;
-      list[pIndex].hebrewDay = hConv.hebrewDay;
-      list[pIndex].hebrewMonth = hConv.hebrewMonth;
-      list[pIndex].hebrewDateStr = hConv.hebrewDateStr;
-      list[pIndex].reminderType = 'gregorian';
+      list[pIndex].birthday = {
+        calendar: 'gregorian',
+        day: day,
+        month: month
+      };
 
       this.saveBirthdays(list);
-      await this.sendSuccessAndMenu(fromJid, list[pIndex], `התאריך עודכן ל-📅 *${day}/${month}* (עברי: ${hConv.hebrewDateStr}) והתזכורת הוגדרה לתאריך הלועזי! ✅`);
+      const enriched = dateService.enrichPersonRecord(list[pIndex]);
+      await this.sendSuccessAndMenu(fromJid, list[pIndex], `התאריך עודכן ל-📅 *${enriched.nextOccurrence.gregorianShortDisplay}* (עברי: ${enriched.nextOccurrence.hebrewShortDisplay}) והתזכורת הוגדרה לתאריך הלועזי! ✅`);
     } else if (session.step === 'UPDATING_HEB_DATE') {
       const parsedHeb = parseHebrewDateString(text);
       if (!parsedHeb || !parsedHeb.hebrewDay || !parsedHeb.hebrewMonth) {
@@ -279,17 +272,15 @@ class WhatsAppBot {
         return;
       }
 
-      const greg = convertHebrewToGregorian(parsedHeb.hebrewDay, parsedHeb.hebrewMonth, 5784);
-
-      list[pIndex].hebrewDay = parsedHeb.hebrewDay;
-      list[pIndex].hebrewMonth = parsedHeb.hebrewMonth;
-      list[pIndex].hebrewDateStr = `${toGematriya(parsedHeb.hebrewDay)} ב${parsedHeb.hebrewMonth}`;
-      list[pIndex].day = greg.day;
-      list[pIndex].month = greg.month;
-      list[pIndex].reminderType = 'hebrew';
+      list[pIndex].birthday = {
+        calendar: 'hebrew',
+        day: parsedHeb.hebrewDay,
+        month: parsedHeb.hebrewMonth
+      };
 
       this.saveBirthdays(list);
-      await this.sendSuccessAndMenu(fromJid, list[pIndex], `התאריך עודכן ל-📜 *${list[pIndex].hebrewDateStr}* (לועזי: ${greg.day}/${greg.month}) והתזכורת הוגדרה לתאריך העברי! ✅`);
+      const enriched = dateService.enrichPersonRecord(list[pIndex]);
+      await this.sendSuccessAndMenu(fromJid, list[pIndex], `התאריך עודכן ל-📜 *${enriched.nextOccurrence.hebrewShortDisplay}* (לועזי: ${enriched.nextOccurrence.gregorianShortDisplay}) והתזכורת הוגדרה לתאריך העברי! ✅`);
     } else if (session.step === 'UPDATING_GENDER') {
       if (text.includes('2') || text.includes('נקבה') || text.includes('בת')) {
         list[pIndex].gender = 'female';
@@ -311,9 +302,11 @@ class WhatsAppBot {
     session.step = 'CHOOSING_OPTION';
   }
 
-  async sendCardSummaryAndMenu(fromJid, person) {
+  async sendCardSummaryAndMenu(fromJid, rawPerson) {
+    const person = dateService.enrichPersonRecord(rawPerson);
     const genderText = person.gender === 'female' ? '👧 נקבה (היקרה שחוגגת)' : '👦 זכר (היקר שחוגג)';
-    const reminderText = person.reminderType === 'hebrew' ? 'לפי תאריך עברי 📜' : 'לפי תאריך לועזי 📅';
+    const isHebrew = person.birthday.calendar === 'hebrew';
+    const reminderText = isHebrew ? 'לפי תאריך עברי 📜' : 'לפי תאריך לועזי 📅';
 
     const menu = `היי שלום! 🎂✨
 שמח לעזור לך לעדכן את הכרטיסייה של *${person.name}*!
@@ -321,9 +314,10 @@ class WhatsAppBot {
 📋 *הפרטים הנוכחיים:*
 • 👤 *שם מלא:* ${person.name}
 • *פנייה:* ${genderText}
-• 📅 *תאריך לועזי:* ${person.day}/${person.month}
-• 📜 *תאריך עברי:* ${person.hebrewDateStr || 'לא הוגדר'}
+• 📅 *תאריך לועזי:* ${person.nextOccurrence.gregorianShortDisplay}
+• 📜 *תאריך עברי:* ${person.nextOccurrence.hebrewShortDisplay}
 • 🔔 *התראה בוואטסאפ:* ${reminderText}
+• ⏳ *הופעה הבאה:* עוד ${person.nextOccurrence.daysRemaining} ימים (${person.nextOccurrence.gregorianDisplay})
 • 👨‍👩‍👧 *קרבה במשפחה:* ${person.relation || 'משפחה'}
 • 💬 *איחול אישי:* "${person.customWish || 'מאחלים לך שפע בריאות ושמחה!'}"
 
@@ -341,7 +335,7 @@ class WhatsAppBot {
     await this.sock.sendMessage(fromJid, { text: menu });
   }
 
-  async sendSuccessAndMenu(fromJid, person, updateNotice) {
+  async sendSuccessAndMenu(fromJid, rawPerson, updateNotice) {
     const msg = `${updateNotice}
 
 🔗 *לצפייה בכרטיסייה המעודכנת באתר המשפחה:*
@@ -458,7 +452,8 @@ https://family-birthday-bot-obx1.onrender.com
     return targetGroup.id;
   }
 
-  formatGreetingMessage(template, person) {
+  formatGreetingMessage(template, rawPerson) {
+    const person = dateService.enrichPersonRecord(rawPerson);
     const isFemale = person.gender === 'female';
     const honorific = isFemale ? 'היקרה שחוגגת היום' : 'היקר שחוגג היום';
     const cleanName = person.name.trim();

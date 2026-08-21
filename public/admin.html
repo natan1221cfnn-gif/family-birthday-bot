@@ -755,17 +755,24 @@
           return;
         }
 
-        adminBirthdaysList.innerHTML = cachedAdminBirthdays.map(item => `
+        adminBirthdaysList.innerHTML = cachedAdminBirthdays.map(item => {
+          const occ = item.nextOccurrence;
+          const isHeb = (item.birthday && item.birthday.calendar === 'hebrew');
+
+          return `
           <div style="display: flex; justify-content: space-between; align-items: center; background: #FAF8F5; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid #EFE8E0; flex-wrap: wrap; gap: 8px;">
             <div>
               <strong>${item.name}</strong> 
               ${item.gender === 'female' ? '👧' : (item.gender === 'male' ? '👦' : '')}
               <span style="color: #666; font-size: 0.88rem;">(${item.relation || 'משפחה'})</span>
-              <div style="font-size: 0.82rem; color: #777; margin-top: 2px;">
-                📅 ${item.day}/${item.month}
-                ${item.hebrewDateStr ? ` • 📜 ${item.hebrewDateStr}` : ''}
-                <span style="background: ${item.reminderType === 'hebrew' ? '#FFF3E0' : '#E8F5E9'}; color: ${item.reminderType === 'hebrew' ? '#E65100' : '#2E7D32'}; padding: 1px 6px; border-radius: 8px; font-weight: 600; margin-right: 4px;">
-                  ${item.reminderType === 'hebrew' ? 'לפי עברי 📜' : 'לפי לועזי 📅'}
+              <div style="font-size: 0.82rem; color: #777; margin-top: 2px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <span>📅 ${occ.gregorianShortDisplay}</span>
+                <span>• 📜 ${occ.hebrewShortDisplay}</span>
+                <span style="background: ${isHeb ? '#FFF3E0' : '#E8F5E9'}; color: ${isHeb ? '#E65100' : '#2E7D32'}; padding: 1px 6px; border-radius: 8px; font-weight: 600;">
+                  ${isHeb ? 'לפי עברי 📜' : 'לפי לועזי 📅'}
+                </span>
+                <span style="background: #EDE8F5; color: #5B21B6; padding: 1px 6px; border-radius: 8px; font-weight: 600;">
+                  ${occ.isToday ? '🎉 היום!' : (occ.daysRemaining === 1 ? 'מחר!' : `עוד ${occ.daysRemaining} ימים`)}
                 </span>
               </div>
             </div>
@@ -774,7 +781,8 @@
               <button type="button" class="delete-btn" onclick="deleteBirthday('${item.id}')">🗑️ מחיקה</button>
             </div>
           </div>
-        `).join('');
+        `;
+        }).join('');
       } catch (err) {
         console.error(err);
       }
@@ -816,15 +824,17 @@
         document.getElementById('editGenderMale').checked = true;
       }
 
-      // Dates
-      document.getElementById('editBirthDay').value = item.day || 1;
-      document.getElementById('editBirthMonth').value = item.month || 1;
+      const isHeb = (item.birthday && item.birthday.calendar === 'hebrew') || item.reminderType === 'hebrew';
 
-      document.getElementById('editHebrewDay').value = item.hebrewDay || 1;
-      document.getElementById('editHebrewMonth').value = item.hebrewMonth || 'תשרי';
+      // Dates
+      document.getElementById('editBirthDay').value = (!isHeb && item.birthday ? item.birthday.day : item.day) || 1;
+      document.getElementById('editBirthMonth').value = (!isHeb && item.birthday ? item.birthday.month : item.month) || 1;
+
+      document.getElementById('editHebrewDay').value = (isHeb && item.birthday ? item.birthday.day : item.hebrewDay) || 1;
+      document.getElementById('editHebrewMonth').value = (isHeb && item.birthday ? item.birthday.month : item.hebrewMonth) || 'תשרי';
 
       // Switch tab based on reminder preference
-      if (item.reminderType === 'hebrew') {
+      if (isHeb) {
         switchEditCalendarType('hebrew');
       } else {
         switchEditCalendarType('gregorian');
@@ -853,7 +863,6 @@
       const id = document.getElementById('editPersonId').value;
       const name = document.getElementById('editPersonName').value.trim();
       const gender = document.querySelector('input[name="editGender"]:checked')?.value || 'male';
-      const reminderType = currentEditCalendarType;
       
       const day = document.getElementById('editBirthDay').value;
       const month = document.getElementById('editBirthMonth').value;
@@ -864,22 +873,20 @@
       const relation = document.getElementById('editPersonRelation').value.trim();
       const customWish = document.getElementById('editCustomWish').value.trim();
 
+      const isHeb = currentEditCalendarType === 'hebrew';
       const activeToken = token || sessionStorage.getItem('admin_token');
 
       try {
         const payload = {
           name,
           gender,
-          dateType: currentEditCalendarType,
-          day,
-          month,
-          hebrewDay,
-          hebrewMonth,
-          reminderType,
           relation,
-          customWish
-        };
-
+          customWish,
+          birthday: {
+            calendar: currentEditCalendarType,
+            day: isHeb ? parseInt(hebrewDay, 10) : parseInt(day, 10),
+            month: isHeb ? hebrewMonth : parseInt(month, 10)
+          }
         const res = await fetch(`/api/admin/birthdays/${id}`, {
           method: 'PUT',
           headers: {
