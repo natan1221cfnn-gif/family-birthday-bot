@@ -904,6 +904,8 @@
             day: isHeb ? parseInt(hebrewDay, 10) : parseInt(day, 10),
             month: isHeb ? hebrewMonth : parseInt(month, 10)
           }
+        };
+
         const res = await fetch(`/api/admin/birthdays/${id}`, {
           method: 'PUT',
           headers: {
