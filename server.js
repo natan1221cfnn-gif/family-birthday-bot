@@ -438,34 +438,58 @@ app.delete('/api/admin/birthdays/:id', checkAuth, (req, res) => {
 });
 
 // ----------------------------------------------------
-// Daily Birthday Cron Job Scheduler
+// Daily Birthday Cron Job Scheduler (with Shabbat Safety)
 // ----------------------------------------------------
-let scheduledTask = null;
+let scheduledTasks = [];
 
 function scheduleDailyJob() {
-  if (scheduledTask) {
-    scheduledTask.stop();
+  if (scheduledTasks && scheduledTasks.length > 0) {
+    scheduledTasks.forEach(task => task.stop());
+    scheduledTasks = [];
   }
 
   const config = getConfig();
   const hour = config.notificationHour !== undefined ? config.notificationHour : 8;
   const minute = config.notificationMinute !== undefined ? config.notificationMinute : 30;
 
-  // Cron format: MINUTE HOUR * * * with Asia/Jerusalem timezone
-  const cronExpr = `${minute} ${hour} * * *`;
-  console.log(`⏰ משימת ימי הולדת מתוזמנת לשעה ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} (שעון ישראל) בכל יום.`);
+  // 1. Weekday Schedule (Sunday to Friday: days 0 to 5)
+  const weekdayCronExpr = `${minute} ${hour} * * 0-5`;
+  console.log(`⏰ משימת ימי חול מתוזמנת לשעה ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} (ימים א'-ו', שעון ישראל).`);
 
-  scheduledTask = cron.schedule(cronExpr, async () => {
-    console.log('⏰ מתחיל בדיקת ימי הולדת יומית (שעון ישראל)...');
-    await checkAndSendTodayBirthdays();
+  const weekdayTask = cron.schedule(weekdayCronExpr, async () => {
+    console.log('⏰ מתחיל בדיקת ימי הולדת יומית לימי חול (שעון ישראל)...');
+    await checkAndSendTodayBirthdays(false);
   }, {
     timezone: "Asia/Jerusalem"
   });
+  scheduledTasks.push(weekdayTask);
+
+  // 2. Motzei Shabbat Schedule (Saturday evening at 21:00: day 6)
+  const shabbatEveningCronExpr = `0 21 * * 6`;
+  console.log(`🕯️ משימת מוצאי שבת מתוזמנת לשעה 21:00 בכל מוצאי שבת (שעון ישראל).`);
+
+  const shabbatTask = cron.schedule(shabbatEveningCronExpr, async () => {
+    console.log('🕯️ מתחיל בדיקת ימי הולדת של מוצאי שבת (שעון ישראל)...');
+    await checkAndSendTodayBirthdays(true);
+  }, {
+    timezone: "Asia/Jerusalem"
+  });
+  scheduledTasks.push(shabbatTask);
 }
 
-async function checkAndSendTodayBirthdays() {
+async function checkAndSendTodayBirthdays(isManualOrEvening = false) {
   const today = dateService.getTodayInIsrael();
   console.log(`[Daily Check] בדיקת ימי הולדת להיום: ${today.dateStr}`);
+
+  // Shabbat safety check: If today is Saturday and it's daytime before 21:00, do not send!
+  const israelNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jerusalem" }));
+  const isSaturday = israelNow.getDay() === 6;
+  const currentHour = israelNow.getHours();
+
+  if (isSaturday && currentHour < 21 && !isManualOrEvening) {
+    console.log(`[Daily Check] 🕯️ היום יום שבת קודש! הברכות יישלחו במוצאי שבת בשעה 21:00.`);
+    return { count: 0, celebrants: [], postponedForShabbat: true };
+  }
 
   const list = getBirthdays();
   const config = getConfig();
