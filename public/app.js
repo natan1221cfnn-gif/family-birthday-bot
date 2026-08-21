@@ -217,7 +217,8 @@ const submitBtn = document.getElementById('submitBtn');
 const formFeedback = document.getElementById('formFeedback');
 const birthdaysList = document.getElementById('birthdaysList');
 const searchInput = document.getElementById('searchInput');
-const monthFilter = document.getElementById('monthFilter');
+const monthFilterGregorian = document.getElementById('monthFilterGregorian');
+const monthFilterHebrew = document.getElementById('monthFilterHebrew');
 const totalCounter = document.getElementById('totalCounter');
 
 // Highlight Card Elements
@@ -283,7 +284,24 @@ window.switchCalendarType = function(type) {
 function setupEventListeners() {
   birthdayForm.addEventListener('submit', handleFormSubmit);
   searchInput.addEventListener('input', renderBirthdays);
-  monthFilter.addEventListener('change', renderBirthdays);
+  
+  if (monthFilterGregorian) {
+    monthFilterGregorian.addEventListener('change', () => {
+      if (monthFilterGregorian.value !== 'all' && monthFilterHebrew) {
+        monthFilterHebrew.value = 'all';
+      }
+      renderBirthdays();
+    });
+  }
+
+  if (monthFilterHebrew) {
+    monthFilterHebrew.addEventListener('change', () => {
+      if (monthFilterHebrew.value !== 'all' && monthFilterGregorian) {
+        monthFilterGregorian.value = 'all';
+      }
+      renderBirthdays();
+    });
+  }
 
   // Admin Login Modal Events
   const openModalBtn = document.getElementById('openAdminModalBtn');
@@ -374,8 +392,8 @@ async function loadBirthdays() {
 }
 
 // Handle Form Submission
-async function handleFormSubmit(e) {
-  e.preventDefault();
+async function handleFormSubmit(e, force = false) {
+  if (e && e.preventDefault) e.preventDefault();
   
   const name = document.getElementById('personName').value.trim();
   const genderRadio = document.querySelector('input[name="gender"]:checked');
@@ -406,6 +424,49 @@ async function handleFormSubmit(e) {
     if (!hebrewDayVal || !hebrewMonthVal) {
       showFeedback('אנא בחרו יום וחודש עברי', 'error');
       return;
+    }
+  }
+
+  // Duplicate Check
+  if (!force) {
+    const existing = allBirthdays.find(p => p.name.trim().toLowerCase() === name.toLowerCase());
+    if (existing) {
+      const existingOcc = getSafeOccurrence(existing);
+      const duplicateModal = document.getElementById('duplicateModal');
+      const duplicateFoundBox = document.getElementById('duplicateFoundBox');
+      const btnCancel = document.getElementById('btnCancelDuplicate');
+      const btnConfirm = document.getElementById('btnConfirmDuplicate');
+      
+      if (duplicateModal && duplicateFoundBox) {
+        const firstLetter = existing.name.charAt(0);
+        duplicateFoundBox.innerHTML = `
+          <div class="duplicate-person-header">
+            <div class="duplicate-avatar">${firstLetter}</div>
+            <div>
+              <div class="duplicate-name">${escapeHtml(existing.name)}</div>
+              <div style="font-size: 0.85rem; color: #78350F;">${existing.relation ? escapeHtml(existing.relation) : 'חבר/ת משפחה'}</div>
+            </div>
+          </div>
+          <div class="duplicate-details">
+            📅 <strong>תאריך לועזי:</strong> ${existingOcc.gregorianDisplay}<br>
+            📜 <strong>תאריך עברי:</strong> ${existingOcc.hebrewDisplay}<br>
+            🔔 <strong>סוג תזכורת:</strong> ${(existing.birthday?.calendar === 'hebrew' || existing.reminderType === 'hebrew') ? 'לפי תאריך עברי' : 'לפי תאריך לועזי'}
+          </div>
+        `;
+        
+        duplicateModal.style.display = 'flex';
+        
+        btnCancel.onclick = () => {
+          duplicateModal.style.display = 'none';
+        };
+        
+        btnConfirm.onclick = async () => {
+          duplicateModal.style.display = 'none';
+          await handleFormSubmit(null, true);
+        };
+        
+        return;
+      }
     }
   }
 
@@ -592,8 +653,9 @@ function updateHighlightCard() {
 
 // Render Birthday List based on Search & Filter
 function renderBirthdays() {
-  const searchTerm = searchInput.value.trim().toLowerCase();
-  const selectedMonth = monthFilter.value;
+  const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+  const selectedGregMonth = monthFilterGregorian ? monthFilterGregorian.value : 'all';
+  const selectedHebMonth = monthFilterHebrew ? monthFilterHebrew.value : 'all';
 
   const processed = allBirthdays.map(item => ({
     item,
@@ -601,12 +663,24 @@ function renderBirthdays() {
   }));
 
   let filtered = processed.filter(({ item, occ }) => {
-    const matchName = item.name.toLowerCase().includes(searchTerm) || 
+    const matchName = !searchTerm ||
+                      item.name.toLowerCase().includes(searchTerm) || 
                       (item.relation && item.relation.toLowerCase().includes(searchTerm)) ||
                       (occ.hebrewDisplay && occ.hebrewDisplay.includes(searchTerm)) ||
                       (occ.gregorianDisplay && occ.gregorianDisplay.includes(searchTerm));
                       
-    const matchMonth = (selectedMonth === 'all' || (occ.gregorianMonth && occ.gregorianMonth.toString() === selectedMonth));
+    let matchMonth = true;
+    if (selectedGregMonth !== 'all') {
+      matchMonth = (occ.gregorianMonth && occ.gregorianMonth.toString() === selectedGregMonth);
+    } else if (selectedHebMonth !== 'all') {
+      const hebStr = `${occ.hebrewDisplay || ''} ${occ.hebrewShortDisplay || ''} ${occ.hebrewMonthName || ''} ${item.birthday?.month || ''} ${item.hebrewMonth || ''}`;
+      if (selectedHebMonth === 'אדר') {
+        matchMonth = hebStr.includes('אדר');
+      } else {
+        matchMonth = hebStr.includes(selectedHebMonth);
+      }
+    }
+
     return matchName && matchMonth;
   });
 
@@ -704,3 +778,16 @@ function toggleBirthdayForm() {
   icon.classList.toggle('open');
   btn.setAttribute('aria-expanded', isOpen);
 }
+
+// Toggle Memorial Story Drawer (Grandma Rachel z"l)
+window.toggleMemorialStory = function() {
+  const drawer = document.getElementById('memorialDrawer');
+  const arrow = document.getElementById('memorialArrow');
+  const btn = document.getElementById('memorialBannerBtn');
+  if (!drawer || !arrow || !btn) return;
+  
+  const isOpen = drawer.classList.toggle('open');
+  arrow.classList.toggle('open');
+  btn.setAttribute('aria-expanded', isOpen);
+};
+

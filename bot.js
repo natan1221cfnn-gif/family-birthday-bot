@@ -473,7 +473,10 @@ https://family-birthday-bot-obx1.onrender.com
 💬 *ברכה:*
 "{wishText}"
 
-אוהבים ומאחלים מכל הלב, המשפחה! 💐🥰`;
+אוהבים ומאחלים מכל הלב, המשפחה! 💐🥰
+
+🎂 *ללוח ימי ההולדת המשפחתי (צפייה ועדכון):*
+🌐 https://family-birthday-bot-obx1.onrender.com`;
 
     let msg = (template && template.trim()) ? template : defaultTemplate;
 

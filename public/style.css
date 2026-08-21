@@ -97,6 +97,129 @@ body {
   gap: 28px;
 }
 
+/* Memorial Banner (סבתא רחל ז״ל) */
+.memorial-banner-section {
+  margin-bottom: 12px;
+}
+
+.memorial-banner-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #FFFDF8 0%, #FFF8EE 100%);
+  border: 1px solid #F5E6CC;
+  border-radius: var(--radius-full);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(180, 130, 70, 0.06);
+  transition: all var(--transition-fast);
+  color: #7C5E3B;
+  font-family: var(--font-body);
+}
+
+.memorial-banner-btn:hover {
+  background: linear-gradient(135deg, #FFFBF2 0%, #FFF3DF 100%);
+  border-color: #EBD4B0;
+  box-shadow: 0 4px 14px rgba(180, 130, 70, 0.12);
+  transform: translateY(-1px);
+}
+
+.memorial-banner-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  flex-wrap: wrap;
+}
+
+.memorial-candle {
+  font-size: 1.1rem;
+  filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.3));
+}
+
+.memorial-dot {
+  color: #D4B896;
+}
+
+.memorial-story-prompt {
+  color: var(--accent-terracotta);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.memorial-arrow {
+  font-size: 0.85rem;
+  color: #9C784E;
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.memorial-arrow.open {
+  transform: rotate(180deg);
+}
+
+.memorial-story-drawer {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, margin 0.3s ease;
+}
+
+.memorial-story-drawer.open {
+  max-height: 500px;
+  opacity: 1;
+  margin-top: 10px;
+}
+
+.memorial-story-card {
+  background: #FFFDF9;
+  border: 1.5px solid #F3E3CA;
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: 0 6px 20px rgba(180, 130, 70, 0.08);
+  position: relative;
+  text-align: right;
+}
+
+.memorial-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.memorial-flower {
+  font-size: 1.4rem;
+}
+
+.memorial-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #634320;
+  margin: 0;
+}
+
+.memorial-text {
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: #5C4B3C;
+  margin: 0 0 10px 0;
+}
+
+.memorial-blessing {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed #EED9BE;
+  font-weight: 700;
+  color: var(--accent-terracotta);
+  font-size: 1rem;
+  text-align: center;
+}
+
 /* Hero Header */
 .hero-header {
   text-align: center;
@@ -711,12 +834,23 @@ textarea {
 }
 
 .controls-wrap {
-  display: grid;
-  grid-template-columns: 1fr 140px;
+  display: flex;
+  flex-direction: column;
   gap: 12px;
 }
-@media (max-width: 520px) {
-  .controls-wrap {
+
+.month-filters-group {
+  width: 100%;
+}
+
+.month-selects-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 540px) {
+  .month-selects-row {
     grid-template-columns: 1fr;
   }
 }
@@ -1020,6 +1154,110 @@ textarea {
 .modal-close-btn:hover {
   background: #EAE3DC;
   color: var(--text-primary);
+}
+
+/* Duplicate Detection Modal */
+.duplicate-modal-card {
+  max-width: 480px;
+  text-align: right;
+}
+
+.duplicate-found-box {
+  background: #FFFBEB;
+  border: 1.5px solid #FDE68A;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin: 12px 0 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.duplicate-person-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.duplicate-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #F59E0B;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.duplicate-name {
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+}
+
+.duplicate-details {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  background: white;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #FEF3C7;
+}
+
+.duplicate-question {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.duplicate-actions-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-cancel-dup {
+  background: #F3F4F6;
+  color: #4B5563;
+  border: 1px solid #D1D5DB;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+}
+
+.btn-cancel-dup:hover {
+  background: #E5E7EB;
+  color: #111827;
+}
+
+.btn-confirm-dup {
+  background: var(--accent-terracotta);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(216, 112, 83, 0.25);
+  transition: all var(--transition-fast);
+  font-family: var(--font-body);
+}
+
+.btn-confirm-dup:hover {
+  background: #C45E43;
+  transform: translateY(-1px);
 }
 
 /* Responsive tweaks */

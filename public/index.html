@@ -27,6 +27,37 @@
   <!-- Main Container -->
   <div class="container">
     
+    <!-- Memorial Banner for Grandma Rachel z"l -->
+    <section class="memorial-banner-section">
+      <button class="memorial-banner-btn" id="memorialBannerBtn" onclick="toggleMemorialStory()" aria-expanded="false">
+        <span class="memorial-banner-text">
+          <span class="memorial-candle">🕯️</span>
+          <strong>מוקדש באהבה לעילוי נשמת סבתא רחל ז״ל</strong>
+          <span class="memorial-dot">•</span>
+          <span class="memorial-story-prompt">📖 הסיפור שמאחורי הלוח המשפחתי</span>
+        </span>
+        <span class="memorial-arrow" id="memorialArrow">▼</span>
+      </button>
+      
+      <div class="memorial-story-drawer" id="memorialDrawer">
+        <div class="memorial-story-card">
+          <div class="memorial-header-row">
+            <span class="memorial-flower">🌸</span>
+            <h3 class="memorial-title">הלב והשמחה של סבתא רחל – תמיד איתנו</h3>
+          </div>
+          <p class="memorial-text">
+            סבתא רחל ז״ל הייתה הלב המאחד של כולנו. היא מעולם לא שכחה שמחה או יום הולדת של אף אחד מאיתנו – תמיד התקשרה ראשונה לברך מכל הלב, לשמח ולהרעיף אהבה.
+          </p>
+          <p class="memorial-text">
+            לוח החגיגות המשפחתי הזה הוקם בהשראתה ולעילוי נשמתה הטהורה, כדי שנמשיך את דרכה המיוחדת: לזכור תמיד לשמוח זה בשמחתו של זה, לחבק ולהישאר משפחה מאוחדת ואוהבת.
+          </p>
+          <div class="memorial-blessing">
+            ✨ תהא נשמתה צרורה בצרור החיים 🤍
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Hero Header -->
     <header class="hero-header">
       <div class="tag-pill">
@@ -234,22 +265,44 @@
               >
             </div>
 
-            <div class="month-filter-wrap">
-              <select id="monthFilter" aria-label="סינון לפי חודש">
-                <option value="all">כל החודשים</option>
-                <option value="1">ינואר</option>
-                <option value="2">פברואר</option>
-                <option value="3">מרץ</option>
-                <option value="4">אפריל</option>
-                <option value="5">מאי</option>
-                <option value="6">יוני</option>
-                <option value="7">יולי</option>
-                <option value="8">אוגוסט</option>
-                <option value="9">ספטמבר</option>
-                <option value="10">אוקטובר</option>
-                <option value="11">נובמבר</option>
-                <option value="12">דצמבר</option>
-              </select>
+            <div class="month-filters-group">
+              <div class="month-selects-row">
+                <div class="month-filter-wrap">
+                  <select id="monthFilterGregorian" aria-label="סינון לפי חודש לועזי">
+                    <option value="all">📅 כל החודשים (לועזי)</option>
+                    <option value="1">1 - ינואר</option>
+                    <option value="2">2 - פברואר</option>
+                    <option value="3">3 - מרץ</option>
+                    <option value="4">4 - אפריל</option>
+                    <option value="5">5 - מאי</option>
+                    <option value="6">6 - יוני</option>
+                    <option value="7">7 - יולי</option>
+                    <option value="8">8 - אוגוסט</option>
+                    <option value="9">9 - ספטמבר</option>
+                    <option value="10">10 - אוקטובר</option>
+                    <option value="11">11 - נובמבר</option>
+                    <option value="12">12 - דצמבר</option>
+                  </select>
+                </div>
+
+                <div class="month-filter-wrap">
+                  <select id="monthFilterHebrew" aria-label="סינון לפי חודש עברי">
+                    <option value="all">📜 כל החודשים (עברי)</option>
+                    <option value="תשרי">תשרי</option>
+                    <option value="חשוון">חשוון</option>
+                    <option value="כסלו">כסלו</option>
+                    <option value="טבת">טבת</option>
+                    <option value="שבט">שבט</option>
+                    <option value="אדר">אדר (כולל א׳ ו-ב׳)</option>
+                    <option value="ניסן">ניסן</option>
+                    <option value="אייר">אייר</option>
+                    <option value="סיוון">סיוון</option>
+                    <option value="תמוז">תמוז</option>
+                    <option value="אב">אב</option>
+                    <option value="אלול">אלול</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -280,6 +333,32 @@
       <button type="button" class="admin-link-btn" id="openAdminModalBtn">הגדרות וניהול בוט ⚙️</button>
     </footer>
 
+  </div>
+
+  <!-- Duplicate Detection Modal -->
+  <div id="duplicateModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-card duplicate-modal-card">
+      <div class="card-header" style="border: none; padding-bottom: 0; margin-bottom: 14px;">
+        <div class="card-icon-bubble" style="background: #FEF3C7; color: #D97706;">⚠️</div>
+        <div>
+          <h2 class="card-title">זיהינו שם זהה במאגר המשפחה!</h2>
+          <p class="card-subtitle">בדקו האם מדובר בכרטיסייה שכבר קיימת</p>
+        </div>
+      </div>
+
+      <div class="duplicate-found-box" id="duplicateFoundBox">
+        <!-- Injected by JS with matching person details -->
+      </div>
+
+      <p class="duplicate-question">
+        האם ברצונכם להוסיף כרטיסייה חדשה נוספת בכל זאת?
+      </p>
+
+      <div class="duplicate-actions-row">
+        <button type="button" class="btn-cancel-dup" id="btnCancelDuplicate">❌ לא, בטל</button>
+        <button type="button" class="btn-confirm-dup" id="btnConfirmDuplicate">✅ כן, הוסף בכל זאת</button>
+      </div>
+    </div>
   </div>
 
   <!-- Admin Login Popup Modal -->
