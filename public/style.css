@@ -316,7 +316,7 @@ body {
   gap: 12px;
 }
 .date-row {
-  grid-template-columns: 1.1fr 1.6fr 1.3fr;
+  grid-template-columns: 1fr 1fr;
 }
 
 label {
@@ -894,10 +894,8 @@ textarea {
     gap: 8px;
   }
   .date-row {
-    grid-template-columns: 1fr 1fr;
-  }
-  .date-row .form-group:last-child {
-    grid-column: span 2;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px;
   }
   .birthday-item {
     flex-direction: column;
