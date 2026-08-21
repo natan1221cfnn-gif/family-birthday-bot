@@ -302,19 +302,34 @@ body {
   width: 100%;
   background: linear-gradient(135deg, #FFF9F5 0%, #FFF2EB 100%);
   border: 1.5px solid #F7DFD3;
-  padding: 18px 24px;
+  padding: 16px 24px;
   border-radius: var(--radius-lg);
   font-family: var(--font-heading);
-  font-size: 1.3rem;
-  font-weight: 700;
   color: var(--accent-terracotta);
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 8px;
   box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
   margin-bottom: 4px;
+}
+
+.btn-main-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.btn-sub-text {
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
 }
 
 .form-toggle-btn:hover {
@@ -323,8 +338,9 @@ body {
 }
 
 .form-toggle-icon {
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  display: inline-block;
 }
 
 .form-toggle-icon.open {
