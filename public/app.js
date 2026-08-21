@@ -188,12 +188,18 @@ function getSafeOccurrence(item) {
     const gregShort = `${day} ב${mName}`;
     const gregFull = `${day} ב${mName} ${targetYear}`;
 
+    let cleanHeb = (item.hebrewDateStr || '').replace(/\s+תש[א-ת"״׳\']+/g, '').replace(/\s+ת\"[א-ת]/g, '').trim();
+    if (!cleanHeb && item.hebrewDay && item.hebrewMonth) {
+      const hNum = HEBREW_NUMERALS[item.hebrewDay - 1] || `${item.hebrewDay}`;
+      cleanHeb = `${hNum} ב${item.hebrewMonth}`;
+    }
+
     return {
       gregorianShortDisplay: gregShort,
       gregorianDisplay: gregFull,
       gregorianMonth: month,
-      hebrewShortDisplay: item.hebrewDateStr || '',
-      hebrewDisplay: item.hebrewDateStr || '',
+      hebrewShortDisplay: cleanHeb,
+      hebrewDisplay: cleanHeb,
       daysRemaining: Math.max(0, diffDays),
       isToday: diffDays === 0
     };
