@@ -705,11 +705,12 @@ function updateHighlightCard() {
     highlightName.textContent = person.name;
     if (highlightCardEl) highlightCardEl.classList.remove('celebration-glow');
     
-    let descText = `ב-📅 ${occ.gregorianShortDisplay}`;
-    if (occ.hebrewShortDisplay) {
-      descText += ` • 📜 ${occ.hebrewShortDisplay}`;
+    const isHebrewPref = (person.birthday && person.birthday.calendar === 'hebrew') || person.reminderType === 'hebrew';
+    if (isHebrewPref) {
+      highlightDesc.textContent = `ב-📜 ${occ.hebrewShortDisplay || occ.hebrewDisplay}`;
+    } else {
+      highlightDesc.textContent = `ב-📅 ${occ.gregorianShortDisplay || occ.gregorianDisplay}`;
     }
-    highlightDesc.textContent = descText;
     
     highlightDays.textContent = occ.daysRemaining;
     highlightDaysText.textContent = occ.daysRemaining === 1 ? 'מחר!' : 'ימים';
@@ -778,8 +779,9 @@ function renderBirthdays() {
               ${item.relation ? `<span class="item-relation">${escapeHtml(item.relation)}</span>` : ''}
             </div>
             <div class="item-date">
-              <span>📅 ${occ.gregorianShortDisplay}</span>
-              ${occ.hebrewShortDisplay ? `<span class="card-hebrew-date">• 📜 ${escapeHtml(occ.hebrewShortDisplay)}</span>` : ''}
+              ${isHebrewPref 
+                ? `<span class="card-hebrew-date">📜 ${escapeHtml(occ.hebrewShortDisplay || occ.hebrewDisplay)}</span>` 
+                : `<span>📅 ${escapeHtml(occ.gregorianShortDisplay || occ.gregorianDisplay)}</span>`}
             </div>
             <div class="item-wish">${item.customWish ? `"${escapeHtml(item.customWish)}"` : '✨ "מאחלים שפע של בריאות, שמחה והגשמת חלומות!"'}</div>
             <div style="display: flex; gap: 8px; align-items: center; margin-top: 4px; flex-wrap: wrap;">

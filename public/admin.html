@@ -793,8 +793,7 @@
               ${item.gender === 'female' ? '👧' : (item.gender === 'male' ? '👦' : '')}
               <span style="color: #666; font-size: 0.88rem;">(${item.relation || 'משפחה'})</span>
               <div style="font-size: 0.82rem; color: #777; margin-top: 2px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                <span>📅 ${occ.gregorianShortDisplay}</span>
-                ${occ.hebrewShortDisplay ? `<span>• 📜 ${occ.hebrewShortDisplay}</span>` : ''}
+                ${isHeb ? `<span>📜 ${occ.hebrewShortDisplay || occ.hebrewDisplay || item.hebrewDateStr}</span>` : `<span>📅 ${occ.gregorianShortDisplay || occ.gregorianDisplay}</span>`}
                 <span style="background: ${isHeb ? '#FFF3E0' : '#E8F5E9'}; color: ${isHeb ? '#E65100' : '#2E7D32'}; padding: 1px 6px; border-radius: 8px; font-weight: 600;">
                   ${isHeb ? 'לפי עברי 📜' : 'לפי לועזי 📅'}
                 </span>
